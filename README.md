@@ -1,9 +1,10 @@
-# ChessAi
-ChessAi Bot that you can play against (WIP)
+# ChessAi Introduction
+K16 is a chess minimax algorithm that uses evaluation functions which determines where it moves which looks at possible future moves and evaluates their positions.
+NOTE: This is a WIP chess bot so moves may not be the "best" in other chess ai programs such as stockfish, this is a supposed simple version of it.
+
 # Limitations and Advantages
 
 - Project still in development, expect bugs
-- K16_1 roughly takes 1 to play at a depth of 3
 - Endgames may be difficult for the computer to find, but different evaluation modes will be added to enhance K16's performance
 - This project will be regularly updated locally (uploading more long term)
 - Kyro16 engine assumes it always will play as white first
