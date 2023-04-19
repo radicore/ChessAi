@@ -1,5 +1,5 @@
 # ChessAi Introduction
-K16 is a chess minimax algorithm that uses a range of functions to determine what and where it moves with a **main** depth of three (3 moves ahead into the future). The depth will increase throuhout the game based on the number of pieces are on the board.
+K16 (Kyro 16) is a chess minimax algorithm that uses a range of functions to determine what and where it moves with a **main** depth of three (3 moves ahead into the future). The depth will increase throuhout the game based on the number of pieces are on the board.
 
 # Limitations and Advantages
 
