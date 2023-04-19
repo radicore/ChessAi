@@ -1,6 +1,5 @@
 # ChessAi Introduction
 K16 is a chess minimax algorithm that uses a range of functions to determine what and where it moves with a **main** depth of three (3 moves ahead into the future). The depth will increase throuhout the game based on the number of pieces are on the board.
-NOTE: This is a WIP chess bot so moves may not be the "best" in other chess ai programs such as stockfish, this is a supposed simple version of it.
 
 # Limitations and Advantages
 
@@ -13,3 +12,4 @@ NOTE: This is a WIP chess bot so moves may not be the "best" in other chess ai p
 
 - Engine types: faster, slower (more accurate, supposedly), and blend of both (however only K16_1 and K16_2 work)
 - Evaluation method improvements and more evaluation functions
+- This is a WIP chess bot so moves may not be the "best" in other chess ai programs such as stockfish, this is a supposed simple version of it.
