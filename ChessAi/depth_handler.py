@@ -11,15 +11,6 @@ corresponding_MD = {
     range(8, 33): 3
 }
 
-"""
-corresponding_MD = {
-    3: 8,
-    4: 7,
-    range(5, 8): 5,
-    range(8, 33): 3
-}
-"""
-
 
 def material_count(BOARD):
     count = sum(1 for square in chess.SQUARES if BOARD.piece_at(square))
@@ -55,7 +46,7 @@ def set_depth(BOARD, engineType=1) -> int:  # precaution incase it breaks
                 3: 8,
                 4: 7,
                 range(5, 8): 5,
-                range(8, 33): 4
+                range(8, 33): 3
             }
             for key in corresponding_MD1:
                 if isinstance(key, int) and key == material_count(BOARD):
