@@ -6,7 +6,7 @@ K16 (Kyro 16) is a chess minimax algorithm that uses a range of functions to det
 - Project still in development, expect bugs
 - Endgames may be difficult for the computer to find, but different evaluation modes will be added to enhance K16's performance
 - This project will be regularly updated locally (uploading more long term)
-- Kyro16 engine assumes it always will play as white first
+- K16 engine assumes it will **always** play as white first, I may be adding an implementation in the future where this can be changed
 
 # Currently in progress
 
