@@ -16,7 +16,7 @@ corresponding_MD = {
     3: 8,
     4: 7,
     range(5, 8): 5,
-    range(8, 33): 4
+    range(8, 33): 3
 }
 """
 
