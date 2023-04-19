@@ -4,34 +4,15 @@ from time import time
 from depth_handler import set_depth, optimal_move
 from evaluation import check_end_game
 
-board = chess.Board("3k4/1R6/8/8/8/6K1/8/8 w - - 12 7")
+board = chess.Board()
 
-ENGINE = "K16_1"  # Kyro16
+ENGINE = "K16_2"  # Kyro16
 MAX_DEPTH = None  # None = Automatic, would recommend keeping it that way
 
 # K16_1 - Slower, lower depth search but supposedly more accurate
 # K16_2 - Faster, higher depth search
 # K16_BLEND - (NOT AVAILABLE) Complement of both engines merged into one (alternating switch)
 
-
-"""
-
------------- Limitations and Advantages ------------
-
-- Project still in development, expect bugs
-- K16_1 roughly takes 1 to play at a depth of 3
-- Endgames with a checkmate in 8+ moves the computer probably will not see, but I will be trying to improve this
-
-+ This project will be regularly updated locally (uploading more long term)
-+ Kyro16 engine assumes it always will play as white first
-
---------------- CURRENTLY WORKING ON ---------------
-
-+ Engine types: faster, slower (more accurate, supposedly), and blend of both
-+ Experimenting with different modes
-+ Experimenting with evaluation methods
-
-"""
 TYPES = {"K16_1": 1, "K16_2": 2, "K16_BLEND": 3}
 
 if ENGINE in TYPES:
