@@ -61,14 +61,14 @@ rooks_table = [
 ]
 
 rooks_end_table = [
-    1, 1, 1, 1, 1, 1, 1, 1,
-    1, 1, 0, 0, 0, 0, 1, 1,
+    1, 2, 1, 1, 1, 1, 2, 1,
+    2, 1, 0, 0, 0, 0, 1, 2,
     1, 0, 0, 0, 0, 0, 0, 1,
     1, 0, 0, 0, 0, 0, 0, 1,
     1, 0, 0, 0, 0, 0, 0, 1,
     1, 0, 0, 0, 0, 0, 0, 1,
-    1, 1, 0, 0, 0, 0, 1, 1,
-    1, 1, 1, 1, 1, 1, 1, 1,
+    2, 1, 0, 0, 0, 0, 1, 2,
+    1, 2, 1, 1, 1, 1, 2, 1,
 ]
 
 queens_table = [
@@ -80,6 +80,17 @@ queens_table = [
     -10, 5, 5, 5, 5, 5, 0, -10,
     -10, 0, 5, 0, 0, 0, 0, -10,
     -20, -10, -10, -5, -5, -10, -10, -20
+]
+
+queens_end_table = [
+    1, 2, 1, 1, 1, 1, 2, 1,
+    2, 1, -10, -10, -10, -10, 1, 2,
+    1, -10, 0, 0, 0, 0, -10, 1,
+    1, -10, 0, 0, 0, 0, -10, 1,
+    1, -10, 0, 0, 0, 0, -10, 1,
+    1, -10, 0, 0, 0, 0, -10, 1,
+    2, 1, -10, -10, -10, -10, 1, 2,
+    1, 2, 1, 1, 1, 1, 2, 1,
 ]
 
 king_middle_table = [
@@ -96,10 +107,10 @@ king_middle_table = [
 king_end_table = [
     -50, -40, -30, -20, -20, -30, -40, -50,
     -40, -20, -10, -10, -10, -10, -20, -40,
-    -30, -10,  10,  20,  20,  7, -10, -30,
-    -20, -10,  20,  40,  40,  20, -10, -20,
-    -20, -10,  20,  40,  40,  20, -10, -20,
-    -30, -10,  10,  20,  20,  10, -10, -30,
+    -30, -10, 10, 20, 20, 7, -10, -30,
+    -20, -10, 20, 40, 40, 20, -10, -20,
+    -20, -10, 20, 40, 40, 20, -10, -20,
+    -30, -10, 10, 20, 20, 10, -10, -30,
     -40, -20, -10, -10, -10, -10, -20, -40,
     -50, -40, -30, -20, -20, -30, -40, -50,
 ]
@@ -121,14 +132,18 @@ pawns_table = np.array(pawns_table)
 knights_table = np.array(knights_table)
 bishops_table = np.array(bishops_table)
 rooks_table = np.array(rooks_table)
+rooks_end_table = np.array(rooks_end_table)
 queens_table = np.array(queens_table)
 king_middle_table = np.array(king_middle_table)
 king_end_table = np.array(king_end_table)
 
 reversed_pawns = np.array(list(reversed(pawns_table)))
 reversed_bishops = np.array(list(reversed(bishops_table)))
+reversed_knights = np.array(list(reversed(knights_table)))
 reversed_rooks = np.array(list(reversed(rooks_table)))
 reversed_end_rooks = np.array(list(reversed(rooks_end_table)))
+reversed_queens = np.array(list(reversed(queens_table)))
+reversed_end_queens = np.array(list(reversed(queens_end_table)))
 reversed_king_middle = np.array(list(reversed(king_middle_table)))
 reversed_king_end = np.array(list(reversed(king_end_table)))
 
@@ -147,16 +162,19 @@ def evaluate_piece(piece, square, end_game):
     if piece_type == chess.PAWN:
         return pawns_table[square] if piece.color == chess.WHITE else -reversed_pawns[square]
     if piece_type == chess.KNIGHT:
-        return knights_table[square]
+        return knights_table[square] if piece.color == chess.WHITE else -reversed_knights[square]
     if piece_type == chess.BISHOP:
         return bishops_table[square] if piece.color == chess.WHITE else -reversed_bishops[square]
     if piece_type == chess.ROOK:
         if end_game:
-            return reversed_end_rooks[square] if piece.color == chess.WHITE else -reversed_end_rooks[square]
+            return rooks_end_table[square] if piece.color == chess.WHITE else -reversed_end_rooks[square]
         else:
             return rooks_table[square] if piece.color == chess.WHITE else -reversed_rooks[square]
     if piece_type == chess.QUEEN:
-        return queens_table[square]
+        if end_game:
+            return queens_end_table[square] if piece.color == chess.WHITE else -reversed_end_queens[square]
+        else:
+            return queens_table[square] if piece.color == chess.WHITE else -reversed_queens[square]
     if piece_type == chess.KING:
         if end_game:
             return king_end_table[square] if piece.color == chess.WHITE else -reversed_king_end[square]
@@ -180,7 +198,7 @@ def check_end_game(BOARD):
 
         count += 1
 
-    if queens == 0 or (queens == 2 and minors <= 1) or count == 4:
+    if queens == 0 or (queens == 2 and minors <= 1) or count <= 5:
         return True
 
     return False
