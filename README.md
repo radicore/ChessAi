@@ -12,4 +12,4 @@ K16 is a chess minimax algorithm that uses a range of functions to determine wha
 
 - Engine types: faster, slower (more accurate, supposedly), and blend of both (however only K16_1 and K16_2 work)
 - Evaluation method improvements and more evaluation functions
-- This is a WIP chess bot so moves may not be the "best" in other chess ai programs such as stockfish, this is a supposed simple version of it.
+- This is a WIP chess bot so moves are based on its own evaluation of position methods
