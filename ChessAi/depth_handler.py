@@ -1,31 +1,12 @@
 import chess
 from minimax import minimax_AB
+from organize import order_moves
 
 DEFAULT = 2
 
 
 def material_count(BOARD):
     return sum(1 for square in chess.SQUARES if BOARD.piece_at(square))
-
-
-def order_moves(BOARD):
-    ordered_legal_moves = []
-    for move in BOARD.legal_moves:
-        if BOARD.is_capture(move) or (move.promotion == chess.QUEEN or move.promotion == chess.KNIGHT) or BOARD.is_checkmate() or BOARD.is_check():
-            if BOARD.is_checkmate():
-                return [move]
-            if BOARD.is_check():
-                ordered_legal_moves.insert(0, move)
-            if move.promotion == chess.QUEEN:
-                ordered_legal_moves.insert(1, move)
-            if move.promotion == chess.KNIGHT:
-                ordered_legal_moves.insert(3, move)
-            if BOARD.is_capture(move):
-                ordered_legal_moves.insert(2, move)
-        else:
-            ordered_legal_moves.append(move)
-
-    return ordered_legal_moves
 
 
 sr = [i for i in range(5, 11)]
