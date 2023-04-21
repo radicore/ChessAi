@@ -1,7 +1,8 @@
 import chess
 import numpy as np
+from piece_mapping import *
 
-# Use numpy for arrays and other values --> (supposedly) quicker processing
+# Use numpy for quicker storing and retrieving data
 
 # Piece value constants
 
@@ -14,223 +15,76 @@ PIECE_VALUES = {
     chess.KING: 20000
 }
 
-# Piece structure tables
 
-pawns_table = [
-    0, 0, 0, 0, 0, 0, 0, 0,
-    5, 10, 10, -20, -20, 10, 10, 5,
-    5, -5, -10, 0, 0, -10, -5, 5,
-    0, 0, 0, 20, 20, 0, 0, 0,
-    5, 5, 10, 25, 25, 10, 5, 5,
-    10, 10, 20, 30, 30, 20, 10, 10,
-    50, 50, 50, 50, 50, 50, 50, 50,
-    0, 0, 0, 0, 0, 0, 0, 0
-]
+# Evaluation function: material balance, mobility (ENDGAME ONLY), king safety, piece mapping, paired bishops
 
-knights_table = [
-    -50, -40, -30, -30, -30, -30, -40, -50,
-    -40, -20, 0, 0, 0, 0, -20, -40,
-    -30, 0, 10, 15, 15, 10, 0, -30,
-    -30, 5, 15, 20, 20, 15, 5, -30,
-    -30, 0, 15, 20, 20, 15, 0, -30,
-    -30, 5, 10, 15, 15, 10, 5, -30,
-    -40, -20, 0, 5, 5, 0, -20, -40,
-    -50, -40, -30, -30, -30, -30, -40, -50,
-]
-
-bishops_table = [
-    -20, -10, -10, -10, -10, -10, -10, -20,
-    -10, 0, 0, 0, 0, 0, 0, -10,
-    -10, 0, 5, 10, 10, 5, 0, -10,
-    -10, 5, 5, 10, 10, 5, 5, -10,
-    -10, 0, 10, 10, 10, 10, 0, -10,
-    -10, 10, 10, 10, 10, 10, 10, -10,
-    -10, 5, 0, 0, 0, 0, 5, -10,
-    -20, -10, -10, -10, -10, -10, -10, -20,
-]
-
-rooks_table = [
-    0, 0, 0, 5, 5, 0, 0, 0,
-    -5, 0, 0, 0, 0, 0, 0, -5,
-    -5, 0, 0, 0, 0, 0, 0, -5,
-    -5, 0, 0, 0, 0, 0, 0, -5,
-    -5, 0, 0, 0, 0, 0, 0, -5,
-    -5, 0, 0, 0, 0, 0, 0, -5,
-    5, 10, 10, 10, 10, 10, 10, 5,
-    0, 0, 0, 0, 0, 0, 0, 0
-]
-
-rooks_end_table = [
-    1, 2, 1, 1, 1, 1, 2, 1,
-    2, 1, 0, 0, 0, 0, 1, 2,
-    1, 0, 0, 0, 0, 0, 0, 1,
-    1, 0, 0, 0, 0, 0, 0, 1,
-    1, 0, 0, 0, 0, 0, 0, 1,
-    1, 0, 0, 0, 0, 0, 0, 1,
-    2, 1, 0, 0, 0, 0, 1, 2,
-    1, 2, 1, 1, 1, 1, 2, 1,
-]
-
-queens_table = [
-    -20, -10, -10, -5, -5, -10, -10, -20,
-    -10, 0, 0, 0, 0, 0, 0, -10,
-    -10, 0, 5, 5, 5, 5, 0, -10,
-    -5, 0, 5, 5, 5, 5, 0, -5,
-    0, 0, 5, 5, 5, 5, 0, -5,
-    -10, 5, 5, 5, 5, 5, 0, -10,
-    -10, 0, 5, 0, 0, 0, 0, -10,
-    -20, -10, -10, -5, -5, -10, -10, -20
-]
-
-queens_end_table = [
-    1, 2, 1, 1, 1, 1, 2, 1,
-    2, 1, -10, -10, -10, -10, 1, 2,
-    1, -10, 0, 0, 0, 0, -10, 1,
-    1, -10, 0, 0, 0, 0, -10, 1,
-    1, -10, 0, 0, 0, 0, -10, 1,
-    1, -10, 0, 0, 0, 0, -10, 1,
-    2, 1, -10, -10, -10, -10, 1, 2,
-    1, 2, 1, 1, 1, 1, 2, 1,
-]
-
-king_middle_table = [
-    -30, -40, -40, -50, -50, -40, -40, -30,
-    -30, -40, -40, -50, -50, -40, -40, -30,
-    -30, -40, -40, -50, -50, -40, -40, -30,
-    -30, -40, -40, -50, -50, -40, -40, -30,
-    -20, -30, -30, -40, -40, -30, -30, -20,
-    -10, -20, -20, -20, -20, -20, -20, -10,
-    20, 20, 0, 0, 0, 0, 20, 20,
-    20, 30, 10, 0, 0, 10, 30, 20
-]
-
-king_end_table = [
-    -50, -40, -30, -20, -20, -30, -40, -50,
-    -40, -20, -10, -10, -10, -10, -20, -40,
-    -30, -10, 10, 20, 20, 7, -10, -30,
-    -20, -10, 20, 40, 40, 20, -10, -20,
-    -20, -10, 20, 40, 40, 20, -10, -20,
-    -30, -10, 10, 20, 20, 10, -10, -30,
-    -40, -20, -10, -10, -10, -10, -20, -40,
-    -50, -40, -30, -20, -20, -30, -40, -50,
-]
-
-"""
-squares_bb = [
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 5, 5, 5, 5, 0, 0,
-    0, 0, 5, 10, 10, 5, 0, 0,
-    0, 0, 5, 10, 10, 5, 0, 0,
-    0, 0, 5, 5, 0, 5, 5, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-]
-"""
-
-pawns_table = np.array(pawns_table)
-knights_table = np.array(knights_table)
-bishops_table = np.array(bishops_table)
-rooks_table = np.array(rooks_table)
-rooks_end_table = np.array(rooks_end_table)
-queens_table = np.array(queens_table)
-king_middle_table = np.array(king_middle_table)
-king_end_table = np.array(king_end_table)
-
-reversed_pawns = np.array(list(reversed(pawns_table)))
-reversed_bishops = np.array(list(reversed(bishops_table)))
-reversed_knights = np.array(list(reversed(knights_table)))
-reversed_rooks = np.array(list(reversed(rooks_table)))
-reversed_end_rooks = np.array(list(reversed(rooks_end_table)))
-reversed_queens = np.array(list(reversed(queens_table)))
-reversed_end_queens = np.array(list(reversed(queens_end_table)))
-reversed_king_middle = np.array(list(reversed(king_middle_table)))
-reversed_king_end = np.array(list(reversed(king_end_table)))
-
-
-# squares_bb = np.array(squares_bb)  # centre control maybe... I think mapping above already does this
-
-
-# Evaluation function: material balance, mobility, king safety, piece mapping, paired bishops
-
-# DONE: material balance, mobility (ENDGAME ONLY), piece mapping (and bb attacked squares mapping)
+# DONE: material balance, mobility, piece mapping (and bitboard attacked squares)
 # FINISHING: king safety, paired bishops
 
 
-def evaluate_piece(piece, square, end_game):
+def evaluate_piece(piece, square, end_game):  # Evaluates piece type & position on the mapping boards defined above
     piece_type = piece.piece_type
+    mapping = []
     if piece_type == chess.PAWN:
-        return pawns_table[square] if piece.color == chess.WHITE else -reversed_pawns[square]
+        mapping = pawns_table if piece.color == chess.WHITE else reversed_pawns
     if piece_type == chess.KNIGHT:
-        return knights_table[square] if piece.color == chess.WHITE else -reversed_knights[square]
+        mapping = knights_table if piece.color == chess.WHITE else reversed_knights
     if piece_type == chess.BISHOP:
-        return bishops_table[square] if piece.color == chess.WHITE else -reversed_bishops[square]
+        mapping = bishops_table if piece.color == chess.WHITE else reversed_bishops
     if piece_type == chess.ROOK:
         if end_game:
-            return rooks_end_table[square] if piece.color == chess.WHITE else -reversed_end_rooks[square]
+            mapping = rooks_end_table if piece.color == chess.WHITE else reversed_end_rooks
         else:
-            return rooks_table[square] if piece.color == chess.WHITE else -reversed_rooks[square]
+            mapping = rooks_table if piece.color == chess.WHITE else reversed_rooks
     if piece_type == chess.QUEEN:
         if end_game:
-            return queens_end_table[square] if piece.color == chess.WHITE else -reversed_end_queens[square]
+            mapping = queens_end_table if piece.color == chess.WHITE else reversed_end_queens
         else:
-            return queens_table[square] if piece.color == chess.WHITE else -reversed_queens[square]
+            mapping = queens_table if piece.color == chess.WHITE else reversed_queens
     if piece_type == chess.KING:
         if end_game:
-            return king_end_table[square] if piece.color == chess.WHITE else -reversed_king_end[square]
+            mapping = king_end_table if piece.color == chess.WHITE else reversed_king_end
         else:
-            return king_middle_table[square] if piece.color == chess.WHITE else -reversed_king_middle[square]
+            mapping = king_middle_table if piece.color == chess.WHITE else reversed_king_middle
+
+    return mapping[square]
 
 
-def check_end_game(BOARD):
-    queens = 0
-    minors = 0
-    count = 0
-    for square in chess.SQUARES:
-        piece = BOARD.piece_at(square)
-        if not piece:
-            continue
-
-        if piece.piece_type == chess.QUEEN:
-            queens += 1
-        if piece.piece_type == chess.BISHOP or piece.piece_type == chess.KNIGHT:
-            minors += 1
-
-        count += 1
-
-    if queens == 0 or (queens == 2 and minors <= 1) or count <= 5:
+def check_end_game(BOARD):  # Basic end-game check, if n total pieces are <= 6 then it is an endgame.
+    # Why <= 6? Because the legal moves function takes a lot of processing time, else I would set this higher
+    if sum(1 for square in chess.SQUARES if BOARD.piece_at(square)) <= 6:
         return True
 
     return False
 
 
-def n_moves(BOARD):  # calculates number of legal moves the current side has
+def n_moves(BOARD):  # Calculates number of legal moves the current side has. (+) white & (-) black
     return len(list(BOARD.legal_moves)) if BOARD.turn == chess.WHITE else -len(list(BOARD.legal_moves))
 
 
-def evaluate(BOARD, end_game=False, engineType=1):  # initializes all evaluation functions above
+def evaluate(BOARD, end_game=False, engineType=1):  # Initializes all evaluation functions above
+    # Basic checks for end games
     if BOARD.is_stalemate() | BOARD.is_insufficient_material() | BOARD.is_repetition():
         return 0
     elif BOARD.is_checkmate():
-        return float("inf") if chess.WHITE else -float("inf")
+        return float("inf") if BOARD.turn == chess.WHITE else -float("inf")
 
     score = 0
-
-    control_table = np.zeros((8, 8), dtype=int)
 
     for square in chess.SQUARES:
         piece = BOARD.piece_at(square)
 
-        if end_game:
-            if piece is None:
+        if end_game:  # If true, less evaluation is needed
+            if piece is None:  # Is there a piece on the square?
                 continue
 
             value = PIECE_VALUES[piece.piece_type]
             score += value if piece.color == chess.WHITE else -value
-            score += n_moves(BOARD) + evaluate_piece(piece, square, end_game)
+            score += n_moves(BOARD) + evaluate_piece(piece, square, end_game) * 5
 
-        elif engineType == 1:
-            # Creates a bitboard of attackers on each square
+        elif engineType == 1:  # Slower but more accurate (?) engine
+            control_table = np.zeros((8, 8), dtype=int)
+            # Creates a bitboard of the number of attackers on each square (including non-occupied squares)
             white_attackers = BOARD.attackers(chess.WHITE, square)
             black_attackers = BOARD.attackers(chess.BLACK, square)
 
@@ -242,17 +96,15 @@ def evaluate(BOARD, end_game=False, engineType=1):  # initializes all evaluation
             if not piece:
                 continue
 
-            # adds piece weight and precomputed scores of the square
+            # Adds the piece weight, mapping values and n attackers based on the piece position
             value = PIECE_VALUES[piece.piece_type] + evaluate_piece(piece, square, end_game)
             score += value if piece.color == chess.WHITE else -value
-            score += control_table[chess.square_rank(square)][chess.square_file(square)]
-        else:  # switch to faster evaluation (engine 2)
+            score += control_table[chess.square_rank(square)][chess.square_file(square)]  # adds attackers
+        else:  # Faster but less accurate (?) engine
             if not piece:
                 continue
 
             value = PIECE_VALUES[piece.piece_type] + evaluate_piece(piece, square, end_game)
             score += value if piece.color == chess.WHITE else -value
-
-    # apparently calling n_moves(BOARD) is what slows the program down, so I left it out
 
     return score
