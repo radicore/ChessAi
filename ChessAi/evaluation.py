@@ -1,5 +1,4 @@
 import chess
-import numpy as np
 from piece_mapping import *
 
 # Use numpy for quicker storing and retrieving data
@@ -15,7 +14,6 @@ PIECE_VALUES = {
     chess.KING: 20000
 }
 
-
 # Evaluation function: material balance, mobility (ENDGAME ONLY), king safety, piece mapping, paired bishops
 
 # DONE: material balance, mobility, piece mapping (and bitboard attacked squares)
@@ -26,26 +24,26 @@ def evaluate_piece(piece, square, end_game):  # Evaluates piece type & position 
     piece_type = piece.piece_type
     mapping = []
     if piece_type == chess.PAWN:
-        mapping = pawns_table if piece.color == chess.WHITE else reversed_pawns
+        mapping = pawns_table if piece.color == chess.WHITE else black_pawns
     if piece_type == chess.KNIGHT:
-        mapping = knights_table if piece.color == chess.WHITE else reversed_knights
+        mapping = knights_table if piece.color == chess.WHITE else black_knights
     if piece_type == chess.BISHOP:
-        mapping = bishops_table if piece.color == chess.WHITE else reversed_bishops
+        mapping = bishops_table if piece.color == chess.WHITE else black_bishops
     if piece_type == chess.ROOK:
         if end_game:
-            mapping = rooks_end_table if piece.color == chess.WHITE else reversed_end_rooks
+            mapping = rooks_end_table if piece.color == chess.WHITE else black_end_rooks
         else:
-            mapping = rooks_table if piece.color == chess.WHITE else reversed_rooks
+            mapping = rooks_table if piece.color == chess.WHITE else black_end_rooks
     if piece_type == chess.QUEEN:
         if end_game:
-            mapping = queens_end_table if piece.color == chess.WHITE else reversed_end_queens
+            mapping = queens_end_table if piece.color == chess.WHITE else black_end_queens
         else:
-            mapping = queens_table if piece.color == chess.WHITE else reversed_queens
+            mapping = queens_table if piece.color == chess.WHITE else black_queens
     if piece_type == chess.KING:
         if end_game:
-            mapping = king_end_table if piece.color == chess.WHITE else reversed_king_end
+            mapping = king_end_table if piece.color == chess.WHITE else black_king_end
         else:
-            mapping = king_middle_table if piece.color == chess.WHITE else reversed_king_middle
+            mapping = king_middle_table if piece.color == chess.WHITE else black_king_middle
 
     return mapping[square]
 
@@ -62,12 +60,26 @@ def n_moves(BOARD):  # Calculates number of legal moves the current side has. (+
     return len(list(BOARD.legal_moves)) if BOARD.turn == chess.WHITE else -len(list(BOARD.legal_moves))
 
 
+def evaluation_2(BOARD, end_game=False):
+    total = 0
+
+    for square in chess.SQUARES:
+        piece = BOARD.piece_at(square)
+        if not piece:
+            continue
+
+        value = PIECE_VALUES[piece.piece_type] + evaluate_piece(piece, square, end_game)
+        total += value if piece.color == chess.WHITE else -value
+
+    return total
+
+
 def evaluate(BOARD, end_game=False, engineType=1):  # Initializes all evaluation functions above
     # Basic checks for end games
     if BOARD.is_stalemate() | BOARD.is_insufficient_material() | BOARD.is_repetition():
         return 0
     elif BOARD.is_checkmate():
-        return float("inf") if BOARD.turn == chess.WHITE else -float("inf")
+        return float("-inf") if BOARD.turn == chess.WHITE else float("inf")
 
     score = 0
 
@@ -78,9 +90,9 @@ def evaluate(BOARD, end_game=False, engineType=1):  # Initializes all evaluation
             if piece is None:  # Is there a piece on the square?
                 continue
 
-            value = PIECE_VALUES[piece.piece_type]
+            value = PIECE_VALUES[piece.piece_type] + n_moves(BOARD)
             score += value if piece.color == chess.WHITE else -value
-            score += n_moves(BOARD) + evaluate_piece(piece, square, end_game) * 5
+            score += evaluate_piece(piece, square, end_game)
 
         elif engineType == 1:  # Slower but more accurate (?) engine
             control_table = np.zeros((8, 8), dtype=int)
@@ -104,7 +116,7 @@ def evaluate(BOARD, end_game=False, engineType=1):  # Initializes all evaluation
             if not piece:
                 continue
 
-            value = PIECE_VALUES[piece.piece_type] + evaluate_piece(piece, square, end_game)
+            value = PIECE_VALUES[piece.piece_type]*1.25 + evaluate_piece(piece, square, end_game)
             score += value if piece.color == chess.WHITE else -value
 
     return score

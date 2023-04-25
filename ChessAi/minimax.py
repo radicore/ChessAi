@@ -3,7 +3,7 @@ from evaluation import evaluate
 
 
 def minimax_AB(board, depth, alpha, beta, maximizing_player, end_game=False, engineType=2, memo={}):
-    key = (board.fen(), depth)
+    key = (hash(board.fen()), depth)
 
     if key in memo:
         return memo[key]
