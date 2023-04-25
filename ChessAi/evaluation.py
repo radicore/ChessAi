@@ -14,6 +14,13 @@ PIECE_VALUES = {
     chess.KING: 20000
 }
 
+"""
+KNIGHT = 3.2 PAWNS
+BISHOP = 3.3 PAWNS
+ROOK = 5 PAWNS = BISHOP or KNIGHT + 2 PAWNS
+QUEEN = 8 PAWNS
+"""
+
 # Evaluation function: material balance, mobility (ENDGAME ONLY), king safety, piece mapping, paired bishops
 
 # DONE: material balance, mobility, piece mapping (and bitboard attacked squares)
@@ -60,20 +67,6 @@ def n_moves(BOARD):  # Calculates number of legal moves the current side has. (+
     return len(list(BOARD.legal_moves)) if BOARD.turn == chess.WHITE else -len(list(BOARD.legal_moves))
 
 
-def evaluation_2(BOARD, end_game=False):
-    total = 0
-
-    for square in chess.SQUARES:
-        piece = BOARD.piece_at(square)
-        if not piece:
-            continue
-
-        value = PIECE_VALUES[piece.piece_type] + evaluate_piece(piece, square, end_game)
-        total += value if piece.color == chess.WHITE else -value
-
-    return total
-
-
 def evaluate(BOARD, end_game=False, engineType=1):  # Initializes all evaluation functions above
     # Basic checks for end games
     if BOARD.is_stalemate() | BOARD.is_insufficient_material() | BOARD.is_repetition():
@@ -116,7 +109,7 @@ def evaluate(BOARD, end_game=False, engineType=1):  # Initializes all evaluation
             if not piece:
                 continue
 
-            value = PIECE_VALUES[piece.piece_type]*1.25 + evaluate_piece(piece, square, end_game)
+            value = PIECE_VALUES[piece.piece_type] + evaluate_piece(piece, square, end_game)
             score += value if piece.color == chess.WHITE else -value
 
     return score

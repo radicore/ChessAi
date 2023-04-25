@@ -5,9 +5,9 @@ from depth_handler import set_depth, optimal_move
 from evaluation import check_end_game
 import multiprocessing as mp
 
-board = chess.Board("6k1/2r3pp/2P1p3/3pn3/6P1/4P3/PPP5/1R2K2R w K - 0 31")  # "3k4/7R/p2N1p2/8/8/8/PPP2PPP/2K4R b - - 0 27"
+board = chess.Board()  # "3k4/7R/p2N1p2/8/8/8/PPP2PPP/2K4R b - - 0 27"
 
-ENGINE = "K16_1"  # Engine model - leave blank for default engine (2) or write "K16_2"
+ENGINE = "K16_2"  # Engine model - leave blank for default engine (2) or write "K16_2"
 MAX_DEPTH = None  # None = Automatic, would recommend keeping it that way
 COMPUTER = chess.WHITE  # What colour the computer plays as
 PROCESSORS = mp.cpu_count()  # Using all CPU's for faster (multi) processing - you can set it manually if you wish
@@ -38,7 +38,7 @@ def play():
     while not (board.is_game_over() or board.is_stalemate() or board.is_repetition()):
         print("Board with fen: ", board.fen())
         if board.turn != COMPUTER:
-            player_move()
+            K16_move()
         else:
             K16_move()
 
