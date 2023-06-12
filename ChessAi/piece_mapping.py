@@ -12,11 +12,6 @@ test = [
     "a1", "b1", "c1", "d1", "e1", "f1", "g1", "h1",
 ]
 
-# -- KEY INFORMATION --
-
-# Works in +2 increment
-# Pawns should develop first
-
 pawns_table = [
     0, 0, 0, 0, 0, 0, 0, 0,
     30, 30, 30, 30, 30, 30, 30, 30,
