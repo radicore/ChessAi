@@ -1,8 +1,11 @@
 from organize import order_moves
-from evaluation import evaluate
+from evaluation import *
 
 
-def minimax_AB(board, depth, alpha, beta, maximizing_player, end_game=False, engineType=2, memo={}):
+def minimax_AB(board, depth, alpha, beta, maximizing_player, end_game=False, engineType=2, memo=None):
+    if memo is None:
+        memo = {}
+
     key = (hash(board.fen()), depth)
 
     if key in memo:
@@ -12,7 +15,7 @@ def minimax_AB(board, depth, alpha, beta, maximizing_player, end_game=False, eng
         return evaluate(board, end_game=end_game, engineType=engineType)
 
     eval_func = max if maximizing_player else min
-    eval_value = float('-inf') if maximizing_player else float('inf')
+    eval_value = -INF if maximizing_player else INF
 
     moves = order_moves(board)
 
@@ -21,8 +24,11 @@ def minimax_AB(board, depth, alpha, beta, maximizing_player, end_game=False, eng
         evaluation = minimax_AB(board, depth - 1, alpha, beta, not maximizing_player, end_game, engineType, memo)
         board.pop()
         eval_value = eval_func(eval_value, evaluation)
+
         alpha = max(alpha, evaluation) if maximizing_player else alpha
         beta = min(beta, evaluation) if not maximizing_player else beta
+
+        # print(alpha, beta)
         if beta <= alpha:
             break
 
