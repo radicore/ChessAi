@@ -10,7 +10,7 @@ INF = 999999
 PIECE_VALUES = {
     chess.PAWN: 100,
     chess.KNIGHT: 320,
-    chess.BISHOP: 330,  # bishops are generally worth more (endgames and can control more squares at once
+    chess.BISHOP: 330,  # bishops are generally worth more (endgames and can control more squares at once)
     chess.ROOK: 500,
     chess.QUEEN: 900,
     chess.KING: 0
