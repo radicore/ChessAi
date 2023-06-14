@@ -3,8 +3,8 @@ K16 (Kyro 16) is a chess minimax algorithm that uses a range of functions to det
 
 # Advantages
 
-- Endgames should work better than midgames
-- Engine can play as white or black
+- Endgames evaluation works better; checkmates with KQk is now inevitable. Other states such as KRk and KBBk checkmates **can** be found, however may do a indirect path towards checkmate
+- K16 Engine can play as white or black
 - Opening moves are intergrated, so computing values at the start is not needed (instant play for first moves)
 
 # Disadvantages
