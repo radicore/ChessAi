@@ -1,8 +1,5 @@
-# import chess.pgn
 import random
 import re
-
-# board = chess.Board()
 
 
 def book_to_array():
@@ -38,21 +35,3 @@ def get_MM(pgn):  # get mainline moves (MM) from extracting specific moves from 
     pgn = re.sub("\d+\.|\*", "", pgn)
     pgn = pgn.split()
     return pgn
-
-"""
-book = book_to_array()
-
-count = -1  # if board.turn == chess.WHITE else 0
-while not board.is_game_over():
-    player = board.push_san(input(": "))
-    count += 2
-
-    game_line = get_MM(chess.pgn.Game.from_board(board))
-    move = random_variation_move(book, game_line, count)
-
-    if move is not None:
-        board.push_san(move)
-    else:
-        # print("====== END OF BOOK MOVES ======")
-        board.push(random.choice(list(board.legal_moves)))
-"""
