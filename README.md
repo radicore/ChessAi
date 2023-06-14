@@ -1,15 +1,23 @@
 # ChessAi Introduction
-K16 (Kyro 16) is a chess minimax algorithm that uses a range of functions to determine what and where it moves with a **main** depth of three (3 moves ahead into the future). The depth will increase throuhout the game based on the number of pieces are on the board.
+K16 (Kyro 16) is a chess minimax algorithm that uses a range of functions to determine what and where it moves with a **main** depth of ~3 (moves ahead) midgame. The depth will increase depending on the game status (n pieces on the board)
 
-# Limitations and Advantages
+# Advantages
 
-- Project still in development, expect bugs
-- Endgames may be difficult for the computer to find, but different evaluation modes will be added to enhance K16's performance
-- This project will be regularly updated locally (uploading more long term)
-- K16 engine assumes it will **always** play as white first, I may be adding an implementation in the future where this can be changed
+- Endgames should work better than midgames
+- Engine can play as white or black
+- Opening moves are intergrated, so computing values at the start is not needed (instant play for first moves)
 
-# Currently in progress
+# Disadvantages
 
-- Engine types: faster, slower (more accurate, supposedly), and blend of both (however only K16_1 and K16_2 work)
-- Evaluation method improvements and more evaluation functions
-- This is a WIP chess bot so moves are based on its own evaluation of position methods
+- Project still in development, expect some logic issues in the K16 Engine play.
+- This project is regularly updated locally on my pc, updates here will be a finalized version.
+- Endgames are more accurate at the cost of a higher depth, meaning higher computing time.
+- The bot assumes it has infinite time limit, I will not be working on any time constraint.
+- Written in Python and not C++, which is generally a lot slower, and a large decrease in depth (to ~3 midgame)
+
+# Additions
+
+- Engine types: 1 and 2. 1 is faster, and 2 is slower but (?) more accurate
+- Evaluation methods improved such as endgame piece tables and increased depth
+- WIP chess bot - the moves are based on its own evaluation of position methods and may not represent the 'best' moves possible, such as stockfish
+
