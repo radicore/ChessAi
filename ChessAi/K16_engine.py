@@ -52,18 +52,21 @@ def play():
     count = -2 if COMPUTER == chess.WHITE else -1
     while not (board.is_game_over() or board.is_stalemate() or board.is_repetition()):
         print("Board with fen: ", board.fen())
-        if board.turn == COMPUTER and CAN_DO_OPENING:
-            count += 2
+        if board.turn == COMPUTER:
+            if CAN_DO_OPENING:
+                count += 2
 
-            game_line = get_MM(chess.pgn.Game.from_board(board))
-            move = random_variation_move(book, game_line, count)
+                game_line = get_MM(chess.pgn.Game.from_board(board))
+                move = random_variation_move(book, game_line, count)
 
-            if move is not None:
-                board.push_san(move)
-                print("\n")
-                print(board)
+                if move is not None:
+                    board.push_san(move)
+                    print("\n")
+                    print(board)
+                else:
+                    # print("====== END OF BOOK MOVES ======")
+                    K16_move()
             else:
-                print("====== END OF BOOK MOVES ======")
                 K16_move()
         else:
             player_move()
@@ -82,3 +85,4 @@ print(board.result())
 
 if board.is_game_over():
     print(chess.pgn.Game.from_board(board))
+    
