@@ -22,5 +22,6 @@ K16 (Kyro 16) is a chess minimax algorithm that uses a range of functions to det
 - WIP chess bot - the moves are based on its own evaluation of position methods and may not represent the 'best' moves possible, such as stockfish
 
 # Things I need to add
-- increased depth if low legal moves available
-- increase the values of piece mappings so it can decide if taking is really the best option and not doing an improving / repositional move
+- Increased depth if low legal moves available
+- Increase the values of piece mappings so it can decide if taking is really the best option and not doing an improving / repositional move
+- calculate a supposed infinite number of takes until there is no takes left, then record the material value and add it on
