@@ -1,15 +1,12 @@
-import chess
-
 from piece_mapping import *
-from directions import *
 
 # Piece value constants
 
-INF = 999999
+INF = 10000
 
 PIECE_VALUES = {
     chess.PAWN: 100,
-    chess.KNIGHT: 320,
+    chess.KNIGHT: 310,
     chess.BISHOP: 330,  # bishops are generally worth more (endgames and can control more squares at once)
     chess.ROOK: 500,
     chess.QUEEN: 900,
@@ -47,7 +44,9 @@ def evaluate_piece(piece, square, end_game):
     elif piece_type == chess.KING:
         mapping = king_end_table if end_game else king_middle_table
 
-    return mapping[chess.square_mirror(square)] if piece.color == chess.WHITE else mapping[square]
+    mapping = [mapping[square-8] for square in mapping] if piece.color == chess.WHITE else mapping
+
+    return mapping[chess.square_mirror(square)]
 
     # print(f" MAPPING VALUE {value}")  # for symmetrical mapping, this value should be zero (equal)
 
@@ -99,15 +98,10 @@ def evaluate(BOARD, end_game=False, engineType=1):  # Initializes all evaluation
             score += value if piece.color == chess.WHITE else -value
 
         elif engineType == 1:  # Slower but more accurate (?) engine
-            control_table = np.zeros((8, 8), dtype=int)
-            # Creates a bitboard of the number of attackers on each square (including non-occupied squares)
             white_attackers = len(BOARD.attackers(chess.WHITE, square))
             black_attackers = len(BOARD.attackers(chess.BLACK, square))
 
-            if white_attackers > 1:
-                control_table[chess.square_rank(square)][chess.square_file(square)] -= white_attackers
-            if black_attackers > 1:
-                control_table[chess.square_rank(square)][chess.square_file(square)] += black_attackers
+            attack_value = (white_attackers - black_attackers)
 
             if piece is None:
                 continue
@@ -115,7 +109,7 @@ def evaluate(BOARD, end_game=False, engineType=1):  # Initializes all evaluation
             # Adds the piece weight, mapping values and n attackers based on the piece position
             val = PIECE_VALUES[piece.piece_type] + evaluate_piece(piece, square, end_game)
             score += val if piece.color == chess.WHITE else -val
-            score += control_table[chess.square_rank(square)][chess.square_file(square)]  # adds attackers
+            score += attack_value
         else:  # Faster but less accurate (?) engine
             if piece is None:
                 continue
