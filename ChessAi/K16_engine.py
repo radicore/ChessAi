@@ -18,7 +18,10 @@ PROCESSORS = mp.cpu_count()  # Using all CPU's for faster (multi) processing - m
 
 game = chess.pgn.Game()  # To save output as pgn
 book = book_to_array()
-board = chess.Board()  # 2rqk2r/1p1bppb1/p2p1np1/3Nn3/3NP2p/1P2B1PP/P1PQ1PB1/3RK2R w Kk - 0 14
+board = chess.Board()
+
+CAN_DO_OPENING = True
+if board.fen() != board.starting_fen: CAN_DO_OPENING = False
 
 
 def K16_move():
@@ -49,26 +52,21 @@ def play():
     count = -2 if COMPUTER == chess.WHITE else 0
     while not (board.is_game_over() or board.is_stalemate() or board.is_repetition()):
         print("Board with fen: ", board.fen())
-        if board.turn == COMPUTER:
-            if board.fen() == board.starting_fen:
-                count += 2
+        if board.turn == COMPUTER and CAN_DO_OPENING:
+            count += 2
 
-                game_line = get_MM(chess.pgn.Game.from_board(board))
-                move = random_variation_move(book, game_line, count)
+            game_line = get_MM(chess.pgn.Game.from_board(board))
+            move = random_variation_move(book, game_line, count)
 
-                if move is not None:
-                    board.push_san(move)
-                    print("\n")
-                    print(board)
-                    print("\n")
-                else:
-                    # print("====== END OF BOOK MOVES ======")
-                    K16_move()
+            if move is not None:
+                board.push_san(move)
+                print("\n")
+                print(board)
             else:
+                print("====== END OF BOOK MOVES ======")
                 K16_move()
         else:
             player_move()
-            # K16_move()  # for computer vs computer lol
 
 
 # cProfile.run("play()")  # debug purposes after run
