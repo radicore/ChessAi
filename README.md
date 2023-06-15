@@ -25,3 +25,4 @@ K16 (Kyro 16) is a chess minimax algorithm that uses a range of functions to det
 - Increased depth if low legal moves available
 - Increase the values of piece mappings so it can decide if taking is really the best option and not doing an improving / repositional move
 - calculate a supposed infinite number of takes until there is no takes left, then record the material value and add it on
+- Saved memory (transposition table) in depth_handler.py
