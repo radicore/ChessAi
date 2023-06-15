@@ -13,7 +13,7 @@ ENGINE = "K16_2"  # Engine model - leave blank for default engine (2) or write "
 # K16_BLEND - (NOT AVAILABLE) Complement of both engines merged into one (alternating switch)
 
 MAX_DEPTH = None  # None = Automatic, would recommend keeping it that way
-COMPUTER = chess.WHITE  # What the computer plays as
+COMPUTER = chess.BLACK  # What the computer plays as
 PROCESSORS = mp.cpu_count()  # Using all CPU's for faster (multi) processing - manual setting may affect moves
 
 game = chess.pgn.Game()  # To save output as pgn
@@ -49,7 +49,7 @@ def player_move():
 
 def play():
     print(board)
-    count = -2 if COMPUTER == chess.WHITE else 0
+    count = -2 if COMPUTER == chess.WHITE else -1
     while not (board.is_game_over() or board.is_stalemate() or board.is_repetition()):
         print("Board with fen: ", board.fen())
         if board.turn == COMPUTER and CAN_DO_OPENING:
