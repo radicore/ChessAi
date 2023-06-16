@@ -13,15 +13,16 @@ ENGINE = "K16_2"  # Engine model - leave blank for default engine (2) or write "
 # K16_BLEND - (NOT AVAILABLE) Complement of both engines merged into one (alternating switch)
 
 MAX_DEPTH = None  # None = Automatic, would recommend keeping it that way
-COMPUTER = chess.BLACK  # What the computer plays as
+DO_OPENING = False  # Start playing book moves when the game starts
+COMPUTER = chess.WHITE  # What the computer plays as
 PROCESSORS = mp.cpu_count()  # Using all CPU's for faster (multi) processing - manual setting may affect moves
 
 game = chess.pgn.Game()  # To save output as pgn
 book = book_to_array()
 board = chess.Board()
 
-CAN_DO_OPENING = True
-if board.fen() != board.starting_fen: CAN_DO_OPENING = False
+
+if board.fen() != board.starting_fen: DO_OPENING = False
 
 
 def K16_move():
@@ -47,27 +48,34 @@ def player_move():
     print(board); print(f"{ENGINE} Engine is thinking...")
 
 
+def computer_move():
+    global count
+    if DO_OPENING:
+        count += 2
+
+        game_line = get_MM(chess.pgn.Game.from_board(board))
+        move = random_variation_move(book, game_line, count)
+
+        if move is not None:
+            board.push_san(move)
+            print("\n")
+            print(board)
+        else:
+            # print("====== END OF BOOK MOVES ======")
+            K16_move()
+    else:
+        K16_move()
+
+
+count = -2 if COMPUTER == chess.WHITE else -1
+
+
 def play():
     print(board)
-    count = -2 if COMPUTER == chess.WHITE else -1
     while not (board.is_game_over() or board.is_stalemate() or board.is_repetition()):
         print("Board with fen: ", board.fen())
         if board.turn == COMPUTER:
-            if CAN_DO_OPENING:
-                count += 2
-
-                game_line = get_MM(chess.pgn.Game.from_board(board))
-                move = random_variation_move(book, game_line, count)
-
-                if move is not None:
-                    board.push_san(move)
-                    print("\n")
-                    print(board)
-                else:
-                    # print("====== END OF BOOK MOVES ======")
-                    K16_move()
-            else:
-                K16_move()
+            computer_move()
         else:
             player_move()
 
@@ -85,4 +93,3 @@ print(board.result())
 
 if board.is_game_over():
     print(chess.pgn.Game.from_board(board))
-    
