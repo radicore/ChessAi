@@ -1,27 +1,26 @@
 import random
+import multiprocessing as mp
+
 from minimax import minimax_AB
 from organize import order_moves
-import multiprocessing as mp
+from chess import SQUARES
 from evaluation import *
 
 
-def material_count(BOARD):
-    return sum(1 for square in chess.SQUARES if BOARD.piece_at(square))
-
-
-sr = [i for i in range(5, 18)]
+def material_count(BOARD):  # adds up how many pieces there are all together (to assist set_depth)
+    return sum(1 for square in SQUARES if BOARD.piece_at(square))
 
 
 def set_depth(BOARD, engineType=2):
     mc = material_count(BOARD)
-    if engineType == 2:  # faster engine
+    if engineType == 2:
         if mc in [3, 4]: return 6
-        elif mc in sr: return 4
+        elif mc in [i for i in range(5, 18)]: return 4
         else: return 3
     else:
         if mc == 3: return 6
         elif mc == 4: return 5
-        elif mc in sr: return 4
+        elif mc in [i for i in range(5, 18)]: return 4
         else: return 3
 
 
@@ -31,13 +30,12 @@ def minimax_worker(move, BOARD, depth, alpha, beta, turn, end_game, engineType, 
 
 
 def optimal_move(max_depth, BOARD, end_game=False, engineType=2, debug=False, processes=4):
-    print(material_score(BOARD))
-    # Iterative deepening
     best_move = None
 
     alpha = -INF
     beta = INF
-    max_eval = -INF if BOARD.turn else INF
+    
+    best_eval = -INF if BOARD.turn else INF
 
     with mp.Pool(processes=processes) as pool, mp.Manager() as manager:
         result_queue = manager.Queue()
@@ -50,9 +48,17 @@ def optimal_move(max_depth, BOARD, end_game=False, engineType=2, debug=False, pr
 
             for _ in range(len(moves)):
                 move, EVAL = result_queue.get()
+                
+                """
+                alpha = max(alpha, EVAL) if BOARD.turn else alpha
+                beta = min(beta, EVAL) if not BOARD.turn else beta
+                """
+
+                # I have a hint it causes a logic error as it only checks for maximizing the current side (finding max values only)
+
                 if BOARD.turn:
-                    if EVAL > max_eval:
-                        max_eval = EVAL
+                    if EVAL > best_eval:
+                        best_eval = EVAL
                         best_move = move
                         if EVAL == INF:
                             pool.terminate(), pool.join()
@@ -60,8 +66,8 @@ def optimal_move(max_depth, BOARD, end_game=False, engineType=2, debug=False, pr
                                 print(f"FORCED CHECKMATE FOUND IN {depth} MOVE(S): {move}")
                             return move, EVAL
                 else:
-                    if EVAL < max_eval:
-                        max_eval = EVAL
+                    if EVAL < best_eval:
+                        best_eval = EVAL
                         best_move = move
                         if EVAL == -INF:
                             pool.terminate(), pool.join()
@@ -70,10 +76,10 @@ def optimal_move(max_depth, BOARD, end_game=False, engineType=2, debug=False, pr
                             return move, EVAL
 
             if best_move is None:
-                return random.choice(list(BOARD.legal_moves)), max_eval
+                return random.choice(list(BOARD.legal_moves)), best_eval
 
-            if debug: print("Depth", depth, "evaluation:", max_eval, "best move:", best_move)
-            if BOARD.turn and max_eval == INF: return best_move, max_eval
-            elif not BOARD.turn and max_eval == -INF: return best_move, max_eval
+            if debug: print("Depth", depth, "Evaluation:", best_eval, "Best move:", best_move)
+            if BOARD.turn and best_eval == INF: return best_move, best_eval
+            elif not BOARD.turn and best_eval == -INF: return best_move, best_eval
 
-    return best_move, max_eval
+    return best_move, best_eval
