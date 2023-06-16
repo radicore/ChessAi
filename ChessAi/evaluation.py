@@ -1,8 +1,9 @@
+import chess
 from piece_mapping import *
 
 # Piece value constants
 
-INF = 10000
+INF = 1e5
 
 PIECE_VALUES = {
     chess.PAWN: 100,
@@ -44,9 +45,7 @@ def evaluate_piece(piece, square, end_game):
     elif piece_type == chess.KING:
         mapping = king_end_table if end_game else king_middle_table
 
-    mapping = [mapping[square-8] for square in mapping] if piece.color == chess.WHITE else mapping
-
-    return mapping[chess.square_mirror(square)]
+    return mapping[chess.square_mirror(square)] if piece.color == chess.WHITE else mapping[chess.square_mirror(square-8)]
 
     # print(f" MAPPING VALUE {value}")  # for symmetrical mapping, this value should be zero (equal)
 
@@ -62,10 +61,12 @@ def check_end_game(BOARD):  # Basic endgame check, if n total pieces are <= 10 t
     return False
 
 
-def n_moves(BOARD):  # Calculates number of legal moves the current side has. (+) white & (-) black
-    BOARD.turn = not BOARD.turn
-    moves = len(list(BOARD.legal_moves))
-    BOARD.turn = not BOARD.turn
+def n_moves(BOARD, current=True):  # Calculates number of legal moves the current side has.
+    moves = int(len(list(BOARD.legal_moves)) / 4)
+    if not current:
+        BOARD.turn = not BOARD.turn
+        moves = int(len(list(BOARD.legal_moves)) / 4)
+        BOARD.turn = not BOARD.turn
     return moves
 
 
@@ -94,17 +95,20 @@ def evaluate(BOARD, end_game=False, engineType=1):  # Initializes all evaluation
         if end_game:  # If true, less evaluation is needed
             if piece is None:  # Is the square occupied?
                 continue
+
+            print(n_moves(BOARD, current=False))
+
             value = PIECE_VALUES[piece.piece_type] + evaluate_piece(piece, square, end_game)
             score += value if piece.color == chess.WHITE else -value
 
         elif engineType == 1:  # Slower but more accurate (?) engine
+            if piece is None:
+                continue
+
             white_attackers = len(BOARD.attackers(chess.WHITE, square))
             black_attackers = len(BOARD.attackers(chess.BLACK, square))
 
             attack_value = (white_attackers - black_attackers)
-
-            if piece is None:
-                continue
 
             # Adds the piece weight, mapping values and n attackers based on the piece position
             val = PIECE_VALUES[piece.piece_type] + evaluate_piece(piece, square, end_game)
@@ -116,5 +120,7 @@ def evaluate(BOARD, end_game=False, engineType=1):  # Initializes all evaluation
 
             val = PIECE_VALUES[piece.piece_type] + evaluate_piece(piece, square, end_game)
             score += val if piece.color == chess.WHITE else -val
+
+    score += n_moves(BOARD) if BOARD.turn == chess.WHITE else -n_moves(BOARD)
 
     return score
