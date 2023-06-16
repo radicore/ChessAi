@@ -49,10 +49,8 @@ def optimal_move(max_depth, BOARD, end_game=False, engineType=2, debug=False, pr
             for _ in range(len(moves)):
                 move, EVAL = result_queue.get()
                 
-                """
                 alpha = max(alpha, EVAL) if BOARD.turn else alpha
                 beta = min(beta, EVAL) if not BOARD.turn else beta
-                """
 
                 # I have a hint it causes a logic error as it only checks for maximizing the current side (finding max values only)
 
