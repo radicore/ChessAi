@@ -108,7 +108,7 @@ def evaluate(BOARD, end_game=False, engineType=1):  # Initializes all evaluation
             if piece is None:
                 continue
 
-            val = evaluate_piece(piece, square, end_game)
+            val = PIECE_VALUES[piece.piece_type] + evaluate_piece(piece, square, end_game)
             score += val if piece.color == chess.WHITE else -val
 
     return score
