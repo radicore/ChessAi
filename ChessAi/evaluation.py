@@ -42,7 +42,7 @@ def evaluate_piece(piece, square, end_game):
     # Use chess.square_mirror() since mapping[E4] would return the value on the D4 square
     # Reason behind this? No clue, chess module being funny.
 
-    return mapping[::-1][square] if piece.color == chess.WHITE else mapping[square]
+    return mapping[::-1][chess.square_mirror(square)] if piece.color == chess.BLACK else mapping[chess.square_mirror(square)]
 
 
 def check_end_game(BOARD):  # Basic endgame check, if n total pieces are <= 8 then it is an endgame.
@@ -108,7 +108,7 @@ def evaluate(BOARD, end_game=False, engineType=1):  # Initializes all evaluation
             if piece is None:
                 continue
 
-            val = PIECE_VALUES[piece.piece_type] + evaluate_piece(piece, square, end_game)
+            val = evaluate_piece(piece, square, end_game)
             score += val if piece.color == chess.WHITE else -val
 
     return score
