@@ -18,7 +18,7 @@ COMPUTER = chess.BLACK  # Which side the computer plays as
 PROCESSORS = mp.cpu_count()  # Using all CPU's for faster (multi) processing - changing this to a value can cause results to vary
 
 game = chess.pgn.Game()  # To show game moves at the end / when you stop the program
-book = book_to_array()  # Used once to convert book.txt to a readable array (used for opening moves) 
+book = book_to_array()  # Used once to convert book.txt to a readable array (used for opening moves)
 board = chess.Board()  # Initializes the chess board. You can set the board FEN position as a string in the brackets
 
 
