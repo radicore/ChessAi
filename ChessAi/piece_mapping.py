@@ -1,19 +1,19 @@
 import numpy as np
 
-# Piece matrix tables
+# 2D square mapping tables
 
-pawns_table = [
+PAWNS_TABLE = [
     0, 0, 0, 0, 0, 0, 0, 0,
     10, 10, 10, 10, 10, 10, 10, 10,
-    6, 6, 4, 2, 2, 4, 6, 6,
-    4, 4, 8, 12, 12, 6, 4, 4,
-    3, 2, 10, 12, 12, 2, 2, 3,
+    6, 6, 4, 4, 4, 4, 6, 6,
+    4, 4, 10, 12, 12, 6, 4, 4,
+    3, 3, 10, 12, 12, 2, 3, 3,
     2, 2, 10, 8, 8, 2, 2, 2,
     -2, -2, -6, -12, -12, 2, -2, -2,
     0, 0, 0, 0, 0, 0, 0, 0,
 ]
 
-pawns_end_table = [
+PAWNS_END_TABLE = [
     0, 0, 0, 0, 0, 0, 0, 0,
     30, 30, 30, 30, 30, 30, 30, 30,
     30, 30, 30, 30, 30, 30, 30, 30,
@@ -24,18 +24,18 @@ pawns_end_table = [
     0, 0, 0, 0, 0, 0, 0, 0,
 ]
 
-knights_table = [
+KNIGHTS_TABLE = [
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 4, 6, 6, 4, 0, 0,
-    0, 0, 6, 8, 8, 6, 0, 0,
+    0, 0, 4, 5, 5, 4, 0, 0,
+    0, 0, 6, 7, 7, 6, 0, 0,
     0, 0, 6, 8, 8, 6, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     -4, -6, -4, -4, -4, -4, -6, -4,
 ]
 
-bishops_table = [
+BISHOPS_TABLE = [
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 2, 2, 0, 0, 0,
@@ -46,7 +46,7 @@ bishops_table = [
     -4, -4, -6, -4, -4, -6, -4, -4,
 ]
 
-rooks_table = [
+ROOKS_TABLE = [
     8, 8, 8, 10, 10, 8, 8, 8,
     16, 16, 16, 16, 16, 16, 16, 16,
     0, 0, 0, 0, 0, 0, 0, 0,
@@ -57,7 +57,7 @@ rooks_table = [
     0, 0, 0, 8, 8, 4, 0, 0,
 ]
 
-rooks_end_table = [
+ROOKS_END_TABLE = [
     0, 4, 0, 0, 0, 0, 4, 0,
     4, 4, 4, 4, 4, 4, 4, 4,
     0, 4, 6, 6, 6, 6, 4, 0,
@@ -68,7 +68,7 @@ rooks_end_table = [
     0, 4, 0, 0, 0, 0, 4, 0,
 ]
 
-queens_table = [
+QUEENS_TABLE = [
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 2, 2, 2, 2, 0, 0,
@@ -79,7 +79,7 @@ queens_table = [
     0, 0, 0, 4, 0, 0, 0, 0,
 ]
 
-queens_end_table = [
+QUEENS_END_TABLE = [
     0, 0,  0,  0,  0,  0,  0, 0,
     0, 8,  0,  0,  0,  0,  8, 0,
     0, 0,  12, 12, 12, 12, 0, 0,
@@ -90,7 +90,7 @@ queens_end_table = [
     0, 0,  0,  0,  0,  0,  0, 0,
 ]
 
-king_middle_table = [
+KINGS_MIDDLE_TABLE = [
     -14, -10, -12, -16, -16, -12, -10, -14,
     -14, -10, -12, -16, -16, -12, -10, -14,
     -14, -10, -16, -20, -20, -16, -10, -14,
@@ -101,7 +101,7 @@ king_middle_table = [
     0, 8, 8, 0, 0, 0, 8, 0,
 ]
 
-king_end_table = [
+KINGS_END_TABLE = [
     -4, -4, -4, -4, -4, -4, -4, -4,
     -4, 8, 8, 8, 8, 8, 8, -4,
     -4, 8, 10, 10, 10, 10, 8, -4,
@@ -112,16 +112,18 @@ king_end_table = [
     -4, -4, -4, -4, -4, -4, -4, -4,
 ]
 
-# Reverse board for black is already implemented in the evaluation.py
+# Reverse board for black is already implemented in the evaluation.py, so no need to do reversed tables here
 
-pawns_table = np.array(pawns_table)
-knights_table = np.array(knights_table)
-bishops_table = np.array(bishops_table)
-rooks_table = np.array(rooks_table)
-queens_table = np.array(queens_table)
-king_middle_table = np.array(king_middle_table)
+# Convert to numpy tables since storing and retrieving data is slightly faster
 
-pawns_end_table = np.array(pawns_end_table)
-rooks_end_table = np.array(rooks_end_table)
-queens_end_table = np.array(queens_end_table)
-king_end_table = np.array(king_end_table)
+PAWNS_TABLE = np.array(PAWNS_TABLE)
+KNIGHTS_TABLE = np.array(KNIGHTS_TABLE)
+BISHOPS_TABLE = np.array(BISHOPS_TABLE)
+ROOKS_TABLE = np.array(ROOKS_TABLE)
+QUEENS_TABLE = np.array(QUEENS_TABLE)
+KINGS_MIDDLE_TABLE = np.array(KINGS_MIDDLE_TABLE)
+
+PAWNS_END_TABLE = np.array(PAWNS_END_TABLE)
+ROOKS_END_TABLE = np.array(ROOKS_END_TABLE)
+QUEENS_END_TABLE = np.array(QUEENS_END_TABLE)
+KINGS_END_TABLE = np.array(KINGS_END_TABLE)
