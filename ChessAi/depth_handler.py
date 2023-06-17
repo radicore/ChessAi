@@ -15,12 +15,11 @@ def set_depth(BOARD, engineType=2):
     mc = material_count(BOARD)
     if engineType == 2:
         if mc in [3, 4]: return 6
-        elif mc in [i for i in range(5, 18)]: return 4
-        else: return 3
+        elif mc in [i for i in range(5, 16)]: return 5
+        else: return 4
     else:
-        if mc == 3: return 6
-        elif mc == 4: return 5
-        elif mc in [i for i in range(5, 18)]: return 4
+        if mc in [3, 4]: return 6
+        elif mc in [i for i in range(5, 16)]: return 4
         else: return 3
 
 
@@ -48,7 +47,7 @@ def optimal_move(max_depth, BOARD, end_game=False, engineType=2, debug=False, pr
 
             for _ in range(len(moves)):
                 move, EVAL = result_queue.get()
-                
+
                 alpha = max(alpha, EVAL) if BOARD.turn else alpha
                 beta = min(beta, EVAL) if not BOARD.turn else beta
 
@@ -76,7 +75,7 @@ def optimal_move(max_depth, BOARD, end_game=False, engineType=2, debug=False, pr
             if best_move is None:
                 return random.choice(list(BOARD.legal_moves)), best_eval
 
-            if debug: print("Depth", depth, "Evaluation:", best_eval, "Best move:", best_move)
+            if debug: print("Depth", depth, "Evaluation:", best_eval / 100, "Best move:", best_move)
             if BOARD.turn and best_eval == INF: return best_move, best_eval
             elif not BOARD.turn and best_eval == -INF: return best_move, best_eval
 
