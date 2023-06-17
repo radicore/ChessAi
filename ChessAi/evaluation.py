@@ -1,84 +1,114 @@
-import random
-import multiprocessing as mp
-
 import chess
+from piece_mapping import *
 
-from minimax import minimax_AB
-from organize import order_moves
-from chess import SQUARES
-from evaluation import *
+INF = 1e5
 
+PIECE_VALUES = {
+    chess.PAWN: 100,
+    chess.KNIGHT: 310,
+    chess.BISHOP: 330,  # bishops are generally worth more (endgames and can control more squares at once)
+    chess.ROOK: 500,
+    chess.QUEEN: 900,
+    chess.KING: 0
+}
 
-def material_count(BOARD):  # adds up how many pieces there are all together (to assist set_depth)
-    return sum(1 for square in SQUARES if BOARD.piece_at(square))
+"""
+- KNIGHT ~3 PAWNS
+- BISHOP ~3 PAWNS
+- ROOK = KNIGHT or BISHOP + 2 PAWNS
+- QUEEN = ROOK + KNIGHT or BISHOP
+"""
 
-
-def set_depth(BOARD, engineType=2):
-    mc = material_count(BOARD)
-    if engineType == 2:
-        if mc in [3, 4]: return 6
-        elif mc in [i for i in range(5, 18)]: return 5
-        else: return 3
-    else:
-        if mc in [3, 4]: return 6
-        elif mc in [i for i in range(5, 16)]: return 5
-        else: return 4
-
-
-def minimax_worker(move, BOARD, depth, alpha, beta, turn, end_game, engineType, result_queue):
-    EVAL = minimax_AB(BOARD, depth, alpha, beta, turn, end_game, engineType)
-    result_queue.put((move, EVAL))
+# Evaluation function: performs calculations based on mobility, n attackers, piece values, positional values
+# K16_2 Uses only 2: piece values and positional values compared to K16_1 which uses all 4 (thus more accurate takes longer to calculate)
 
 
-def optimal_move(max_depth, BOARD, end_game=False, engineType=2, debug=False, processes=4):
-    best_move = None
+def evaluate_piece(piece, square, end_game):
+    piece_type = piece.piece_type
+    mapping = []  # used to store square mapping (piece mapping tables)
+    if piece_type == chess.PAWN:
+        mapping = PAWNS_END_TABLE if end_game else PAWNS_TABLE
+    elif piece_type == chess.KNIGHT:
+        mapping = KNIGHTS_TABLE
+    elif piece_type == chess.BISHOP:
+        mapping = BISHOPS_TABLE
+    elif piece_type == chess.ROOK:
+        mapping = ROOKS_END_TABLE if end_game else ROOKS_TABLE
+    elif piece_type == chess.QUEEN:
+        mapping = QUEENS_END_TABLE if end_game else QUEENS_TABLE
+    elif piece_type == chess.KING:
+        mapping = KINGS_END_TABLE if end_game else KINGS_MIDDLE_TABLE
 
-    alpha = -INF
-    beta = INF
-    
-    best_eval = -INF if BOARD.turn else INF
+    # Use chess.square_mirror() since mapping[E4] would return the value on the D4 square
+    # Reason behind this? No clue, chess module being funny.
 
-    with mp.Pool(processes=processes) as pool, mp.Manager() as manager:
-        result_queue = manager.Queue()
-        moves = order_moves(BOARD)
-        for depth in range(1, max_depth + 1):
-            for move in moves:
-                BOARD.push(move)
-                pool.apply_async(minimax_worker, args=(move, BOARD.copy(), depth, alpha, beta, BOARD.turn, end_game, engineType, result_queue))
-                BOARD.pop()
+    return mapping[::-1][square] if piece.color == chess.WHITE else mapping[square]
 
-            for _ in range(len(moves)):
-                move, EVAL = result_queue.get()
 
-                alpha = max(alpha, EVAL) if BOARD.turn else alpha
-                beta = min(beta, EVAL) if not BOARD.turn else beta
+def check_end_game(BOARD):  # Basic endgame check, if n total pieces are <= 8 then it is an endgame.
+    if sum(1 for square in chess.SQUARES if BOARD.piece_at(square)) <= 8:
+        return True
 
-                # I have a hint it causes a logic error as it only checks for maximizing the current side (finding max values only)
+    return False
 
-                if BOARD.turn:
-                    if EVAL > best_eval:
-                        best_eval = EVAL
-                        best_move = move
-                        if EVAL == INF:
-                            pool.terminate(), pool.join()
-                            if debug:
-                                print(f"FORCED CHECKMATE FOUND IN {depth} MOVE(S): {move}")
-                            return move, EVAL
-                else:
-                    if EVAL < best_eval:
-                        best_eval = EVAL
-                        best_move = move
-                        if EVAL == -INF:
-                            pool.terminate(), pool.join()
-                            if debug:
-                                print(f"FORCED CHECKMATE FOUND IN {depth} MOVE(S): {move}")
-                            return move, EVAL
 
-            if best_move is None:
-                return random.choice(list(BOARD.legal_moves)), best_eval
+def n_moves(BOARD, current=True):  # Calculates number of legal moves the current side has.
+    moves = int(len(list(BOARD.legal_moves)))
+    if not current:
+        BOARD.turn = not BOARD.turn
+        moves = int(len(list(BOARD.legal_moves)))
+        BOARD.turn = not BOARD.turn
+    return int(moves / 5)
 
-            if debug: print("Depth", depth, "Evaluation:", best_eval / 100, "Best move:", best_move)
-            if BOARD.turn and best_eval == INF: return best_move, best_eval
-            elif not BOARD.turn and best_eval == -INF: return best_move, best_eval
 
-    return best_move, best_eval
+def material_score(BOARD):  # used in depth_handler.py
+    score = 0
+    for square in chess.SQUARES:
+        piece = BOARD.piece_at(square)
+        if piece:
+            value = PIECE_VALUES[piece.piece_type]
+            score += value if piece.color == chess.WHITE else -value
+
+    return score
+
+
+def evaluate(BOARD, end_game=False, engineType=1):  # Initializes all evaluation functions above
+    # Basic checks for end games
+    if BOARD.is_stalemate() | BOARD.is_insufficient_material() | BOARD.is_repetition():
+        return 0
+    elif BOARD.is_checkmate():
+        return -INF if BOARD.turn == chess.WHITE else INF
+
+    score = 0
+
+    for square in chess.SQUARES:
+        piece = BOARD.piece_at(square)
+        if end_game:  # If true, less evaluation is needed
+            if piece is None:  # Is the square occupied?
+                continue
+
+            value = PIECE_VALUES[piece.piece_type] + evaluate_piece(piece, square, end_game)
+            score += value if piece.color == chess.WHITE else -value
+
+        elif engineType == 1:  # Slower but more accurate (?) engine
+            if piece is None:
+                continue
+
+            white_attackers = len(BOARD.attackers(chess.WHITE, square))
+            black_attackers = len(BOARD.attackers(chess.BLACK, square))
+
+            attack_value = (white_attackers - black_attackers)
+
+            # Adds the piece weight, mapping values and n attackers based on the piece position
+            val = PIECE_VALUES[piece.piece_type] + evaluate_piece(piece, square, end_game)
+            score += n_moves(BOARD) if BOARD.turn == chess.WHITE else -n_moves(BOARD)
+            score += val if piece.color == chess.WHITE else -val
+            score += attack_value
+        else:  # Faster but less accurate (?) engine
+            if piece is None:
+                continue
+
+            val = PIECE_VALUES[piece.piece_type] + evaluate_piece(piece, square, end_game)
+            score += val if piece.color == chess.WHITE else -val
+
+    return score
