@@ -6,20 +6,20 @@ from time import time
 from depth_handler import set_depth, optimal_move
 from opening_handler import *
 
-ENGINE = "K16_1"  # Engine model
+ENGINE = "K16_2"  # Engine model
 
 # K16_1 - Slower, lower depth search but supposedly more accurate
 # K16_2 - Faster, higher depth search
 # K16_BLEND - (NOT AVAILABLE) Complement of both engines merged into one (alternating switch)
 
 MAX_DEPTH = None  # None = Automatic, would recommend keeping it that way
-DO_OPENING = True  # Start playing book moves when the game starts
-COMPUTER = chess.WHITE  # What the computer plays as
-PROCESSORS = mp.cpu_count()  # Using all CPU's for faster (multi) processing - manual setting may affect moves
+DO_OPENING = True  # Should the computer play instant openings?
+COMPUTER = chess.BLACK  # Which side the computer plays as
+PROCESSORS = mp.cpu_count()  # Using all CPU's for faster (multi) processing - changing this to a value can cause results to vary
 
-game = chess.pgn.Game()  # To save output as pgn
-book = book_to_array()
-board = chess.Board()
+game = chess.pgn.Game()  # To show game moves at the end / when you stop the program
+book = book_to_array()  # Used once to convert book.txt to a readable array (used for opening moves) 
+board = chess.Board()  # Initializes the chess board. You can set the board FEN position as a string in the brackets
 
 
 if board.fen() != board.starting_fen: DO_OPENING = False
