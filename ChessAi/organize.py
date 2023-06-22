@@ -7,10 +7,10 @@ def order_moves(BOARD):
         if BOARD.is_capture(move) or BOARD.is_en_passant(move) or (move.promotion in [QUEEN, KNIGHT, ROOK, BISHOP]) or BOARD.is_checkmate() or BOARD.is_check():
             if BOARD.is_checkmate():
                 return [move]
-            elif BOARD.is_check():
-                high_score_moves.insert(0, move)
             elif BOARD.is_capture(move) or BOARD.is_en_passant(move):
                 high_score_moves.insert(1, move)
+            elif BOARD.is_check():
+                high_score_moves.insert(0, move)
             elif move.promotion == QUEEN:
                 high_score_moves.insert(2, move)
             elif move.promotion == KNIGHT:
