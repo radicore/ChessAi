@@ -17,16 +17,18 @@ def book_to_array():
 
 def random_variation_move(variation, mainline, i):
     matched_games = []  # Games matching the mainline game moves
-    move = None
     for game in variation:
         # Check what current played moves any x variations with the same moves from book_to_array (book.txt)
         if game[:len(mainline)] == mainline[:len(mainline)]:
             matched_games.append(game)
 
     if len(matched_games) > 0:  # is there at least 1 variation
-        return random.choice(matched_games)[i]
+        try:
+            return random.choice(matched_games)[i]
+        except IndexError:
+            return None
 
-    return move  # No more book moves
+    return None  # No more book moves
 
 
 def get_MM(pgn):  # get mainline moves (MM) from extracting specific moves from the current pgn using regex
