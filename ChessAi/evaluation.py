@@ -1,7 +1,7 @@
 import chess
 from piece_mapping import *
 
-INF = 1e5
+INF = 1e6
 
 PIECE_VALUES = {
     chess.PAWN: 100,
@@ -23,15 +23,15 @@ PIECE_VALUES = {
 # K16_2 Uses only 2: piece values and positional values compared to K16_1 which uses all 4 (thus more accurate takes longer to calculate)
 
 
-def evaluate_piece(piece, square, end_game):
+def square_mapping(piece, square, end_game):
     piece_type = piece.piece_type
     mapping = []  # used to store square mapping (piece mapping tables)
     if piece_type == chess.PAWN:
         mapping = PAWNS_END_TABLE if end_game else PAWNS_TABLE
     elif piece_type == chess.KNIGHT:
-        mapping = KNIGHTS_TABLE
+        mapping = KNIGHTS_END_TABLE if end_game else KNIGHTS_TABLE
     elif piece_type == chess.BISHOP:
-        mapping = BISHOPS_TABLE
+        mapping = BISHOPS_END_TABLE if end_game else BISHOPS_TABLE
     elif piece_type == chess.ROOK:
         mapping = ROOKS_END_TABLE if end_game else ROOKS_TABLE
     elif piece_type == chess.QUEEN:
@@ -42,23 +42,25 @@ def evaluate_piece(piece, square, end_game):
     # Use chess.square_mirror() since mapping[E4] would return the value on the D4 square
     # Reason behind this? No clue, chess module being funny.
 
-    return mapping[::-1][chess.square_mirror(square)] if piece.color == chess.BLACK else mapping[chess.square_mirror(square)]
+    # engine sucks atm
+
+    return mapping[chess.square_mirror(square)] if chess.WHITE else mapping[::-1][square]
 
 
-def check_end_game(BOARD):  # Basic endgame check, if n total pieces are <= 8 then it is an endgame.
+def is_end_game(BOARD):  # Basic endgame check, if n total pieces are <= 6 then it is an endgame.
     if sum(1 for square in chess.SQUARES if BOARD.piece_at(square)) <= 8:
         return True
 
     return False
 
 
-def n_moves(BOARD, current=True):  # Calculates number of legal moves the current side has.
+def n_moves(BOARD, end_game=False):  # Calculates number of legal moves the current side has.
     moves = int(len(list(BOARD.legal_moves)))
-    if not current:
+    if end_game:
         BOARD.turn = not BOARD.turn
         moves = int(len(list(BOARD.legal_moves)))
         BOARD.turn = not BOARD.turn
-    return int(moves / 5)
+    return round(moves / 4) if not end_game else round(moves)
 
 
 def material_score(BOARD):  # used in depth_handler.py
@@ -73,7 +75,7 @@ def material_score(BOARD):  # used in depth_handler.py
 
 
 def evaluate(BOARD, end_game=False, engineType=1):  # Initializes all evaluation functions above
-    # Basic checks for end games
+    # Basic checks for game status
     if BOARD.is_stalemate() | BOARD.is_insufficient_material() | BOARD.is_repetition():
         return 0
     elif BOARD.is_checkmate():
@@ -87,7 +89,8 @@ def evaluate(BOARD, end_game=False, engineType=1):  # Initializes all evaluation
             if piece is None:  # Is the square occupied?
                 continue
 
-            value = PIECE_VALUES[piece.piece_type] + evaluate_piece(piece, square, end_game)
+            # For endgames the square mapping is decreased and legal moves increases (for checkmate finding)
+            value = PIECE_VALUES[piece.piece_type] + square_mapping(piece, square, end_game)
             score += value if piece.color == chess.WHITE else -value
 
         elif engineType == 1:  # Slower but more accurate (?) engine
@@ -100,15 +103,16 @@ def evaluate(BOARD, end_game=False, engineType=1):  # Initializes all evaluation
             attack_value = (white_attackers - black_attackers)
 
             # Adds the piece weight, mapping values and n attackers based on the piece position
-            val = PIECE_VALUES[piece.piece_type] + evaluate_piece(piece, square, end_game)
-            score += n_moves(BOARD) if BOARD.turn == chess.WHITE else -n_moves(BOARD)
+            val = PIECE_VALUES[piece.piece_type] + square_mapping(piece, square, end_game)
             score += val if piece.color == chess.WHITE else -val
             score += attack_value
         else:  # Faster but less accurate (?) engine
             if piece is None:
                 continue
 
-            val = PIECE_VALUES[piece.piece_type] + evaluate_piece(piece, square, end_game)
+            val = PIECE_VALUES[piece.piece_type] + square_mapping(piece, square, end_game)
             score += val if piece.color == chess.WHITE else -val
+
+    score += n_moves(BOARD, end_game) if BOARD.turn == chess.WHITE else -n_moves(BOARD, end_game)
 
     return score
