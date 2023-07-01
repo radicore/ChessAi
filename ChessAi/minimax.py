@@ -2,7 +2,7 @@ from organize import order_moves
 from evaluation import *
 
 
-def minimax_AB(board, depth, alpha, beta, maximizing_player, end_game=False, engineType=2, memo=None):
+def minimax_AB(board: chess.Board, depth: int, alpha: int, beta: int, maximizing_player: bool, end_game=False, engineType=2, memo=None):
     if memo is None:
         memo = {}
 
@@ -12,7 +12,7 @@ def minimax_AB(board, depth, alpha, beta, maximizing_player, end_game=False, eng
         return memo[key]
 
     if depth == 0 or board.is_game_over() or board.is_checkmate():
-        return evaluate(board, end_game=end_game, engineType=engineType)
+        return evaluate(board, end_game, engineType)
 
     eval_func = max if maximizing_player else min
     best_eval = -INF if maximizing_player else INF
