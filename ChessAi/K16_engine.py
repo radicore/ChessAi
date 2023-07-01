@@ -5,11 +5,12 @@ import multiprocessing as mp
 from time import time
 from depth_handler import set_depth, optimal_move
 from opening_handler import *
-from evaluation import is_end_game, n_moves
+from evaluation import is_end_game
 
 # FOREWORD: Make sure to calculate material advantage after takes n (inf) times to make it not think its a good trade at depth of 4
 
 ENGINE = "K16_1"  # Engine model
+COMPUTER = chess.WHITE  # Which side the computer plays as
 
 # K16_1 - Slower, lower depth search but supposedly more accurate
 # K16_2 - Faster, higher depth search
@@ -21,7 +22,6 @@ board = chess.Board()  # Initializes the chess board. You can set the board FEN 
 
 MAX_DEPTH = None  # None = Automatic, would recommend keeping it that way
 DO_OPENING = True  # Should the computer play instant openings?
-COMPUTER = chess.WHITE  # Which side the computer plays as
 PROCESSORS = mp.cpu_count()  # Using all CPU's for faster (multi) processing - changing this to a value can cause results to vary
 
 game = chess.pgn.Game()  # To show game moves at the end / when you stop the program
@@ -34,7 +34,6 @@ def K16_move():
     TYPES = {"K16_1": 1, "K16_2": 2, "K16_BLEND": 3}; TYPE = 2  # default type 2 (faster version)
     if ENGINE in TYPES: TYPE = TYPES[ENGINE]
     max_depth = set_depth(board, engineType=TYPE) if MAX_DEPTH is None else MAX_DEPTH
-    print(n_moves(board, is_end_game(board)))
     start = time()
     best_move, evaluation = optimal_move(max_depth, board, engineType=TYPE, processes=PROCESSORS, end_game=is_end_game(board), debug=True)
     board.push(best_move)
