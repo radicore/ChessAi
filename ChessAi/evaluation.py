@@ -6,7 +6,7 @@ INF = 1e6
 PIECE_VALUES = {
     chess.PAWN: 100,
     chess.KNIGHT: 310,
-    chess.BISHOP: 330,  # bishops are generally worth more (endgames and can control more squares at once)
+    chess.BISHOP: 320,  # bishops are generally worth more (can control more squares at once)
     chess.ROOK: 500,
     chess.QUEEN: 900,
     chess.KING: 0
@@ -47,8 +47,8 @@ def square_mapping(piece, square, end_game):
     return mapping[chess.square_mirror(square)] if chess.WHITE else mapping[::-1][square]
 
 
-def is_end_game(BOARD):  # Basic endgame check, if n total pieces are <= 6 then it is an endgame.
-    if sum(1 for square in chess.SQUARES if BOARD.piece_at(square)) <= 8:
+def is_end_game(BOARD):  # Basic endgame check, if n total pieces are <= 7 then it is an endgame.
+    if sum(1 for square in chess.SQUARES if BOARD.piece_at(square)) <= 7:
         return True
 
     return False
@@ -60,7 +60,7 @@ def n_moves(BOARD, end_game=False):  # Calculates number of legal moves the curr
         BOARD.turn = not BOARD.turn
         moves = int(len(list(BOARD.legal_moves)))
         BOARD.turn = not BOARD.turn
-    return round(moves / 4) if not end_game else round(moves)
+    return round(moves) if end_game else round(moves / 4)
 
 
 def material_score(BOARD):  # used in depth_handler.py
@@ -113,6 +113,6 @@ def evaluate(BOARD, end_game=False, engineType=1):  # Initializes all evaluation
             val = PIECE_VALUES[piece.piece_type] + square_mapping(piece, square, end_game)
             score += val if piece.color == chess.WHITE else -val
 
-    score += n_moves(BOARD, end_game) if BOARD.turn == chess.WHITE else -n_moves(BOARD, end_game)
+    # score += n_moves(BOARD, end_game) if BOARD.turn == chess.WHITE else -n_moves(BOARD, end_game)
 
     return score
