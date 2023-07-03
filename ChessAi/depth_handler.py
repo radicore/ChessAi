@@ -13,25 +13,34 @@ def material_count(BOARD):  # adds up how many pieces there are all together (to
 
 def set_depth(BOARD, engineType=2):
     mc = material_count(BOARD)
+    lm = len(list(BOARD.legal_moves))
     if BOARD.fen() in\
             ["8/8/8/8/3K4/2R5/1k6/8 w - - 0 1",
              "8/1k6/2R5/3K4/8/8/8/8 w - - 0 1",
              "8/6k1/5R2/4K3/8/8/8/8 w - - 0 1",
              "8/8/8/8/4K3/5R2/6k1/8 w - - 0 1"]:
         return 10
-    elif mc in [3, 4]:  # endgame
-        return 6
 
-    if engineType == 2:
-        if mc in [i for i in range(6, 16)]:
-            return 5
-        else:
-            return 3
+    if mc in [3, 4]:  # endgame
+        depth = 6
     else:
-        if mc in [i for i in range(6, 12)]:
-            return 5
+        if engineType == 2:
+            if mc in [i for i in range(6, 16+1)]:
+                depth = 5
+            else:
+                depth = 4
         else:
-            return 3
+            if mc in [i for i in range(6, 16+1)]:
+                depth = 5
+            else:
+                depth = 4
+
+    if lm <= 8 and depth != 5:
+        depth += 1
+
+    print(f"\nDEPTH SEARCH = {depth}\n")
+
+    return depth
 
 
 def minimax_worker(move, BOARD, depth, alpha, beta, turn, end_game, engineType, result_queue):
@@ -51,14 +60,11 @@ def optimal_move(max_depth, BOARD, end_game=False, engineType=2, debug=False, pr
 
     if max_depth == 10: step = 10  # for known position (rook + king)
 
-    if len(list(BOARD.legal_moves)) <= 15 and not end_game:
-        max_depth += step
+    moves = order_moves(BOARD)
 
     with mp.Pool(processes=processes) as pool, mp.Manager() as manager:
         result_queue = manager.Queue()
-        moves = order_moves(BOARD)
-
-        for depth in range(1, max_depth + 1, step):
+        for depth in range(1, max_depth+1, step):
             for move in moves:
                 BOARD.push(move)
                 pool.apply_async(minimax_worker, args=(move, BOARD.copy(), depth, alpha, beta, BOARD.turn, end_game, engineType, result_queue))
