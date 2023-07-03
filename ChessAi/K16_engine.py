@@ -10,15 +10,16 @@ from evaluation import is_end_game
 # FOREWORD: Make sure to calculate material advantage after takes n (inf) times to make it not think its a good trade at depth of 4
 
 ENGINE = "K16_1"  # Engine model
-COMPUTER = chess.WHITE  # Which side the computer plays as
+COMPUTER = chess.BLACK  # Which side the computer plays as
 
 # K16_1 - Slower, lower depth search but supposedly more accurate
 # K16_2 - Faster, higher depth search
 # K16_BLEND - (NOT AVAILABLE) Complement of both engines merged into one (alternating switch)
 
-# r2q1rk1/1b2bpp1/p2p1n1p/1pp5/4PB2/1PNP1N2/1PP2PPP/R2Q1RK1 w - - 0 14
+# r5k1/1nqp1ppp/p1p1r3/1p2P3/4NBPb/1Q6/PPP2P1P/3RR1K1 w - - 4 20
 # 8/8/8/3KR3/8/5k2/8/8 w - - 10 6
 board = chess.Board()  # Initializes the chess board. You can set the board FEN position as a string in the brackets
+
 
 MAX_DEPTH = None  # None = Automatic, would recommend keeping it that way
 DO_OPENING = True  # Should the computer play instant openings?
@@ -29,6 +30,8 @@ book = book_to_array()  # Used once to convert book.txt to a readable array (use
 
 if board.fen() != board.starting_fen: DO_OPENING = False
 
+
+# print(evaluate(board, engineType=2))  # should be zero
 
 def K16_move():
     TYPES = {"K16_1": 1, "K16_2": 2, "K16_BLEND": 3}; TYPE = 2  # default type 2 (faster version)
