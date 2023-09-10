@@ -1,18 +1,22 @@
 from organize import order_moves
 from evaluation import *
 
+# condensed alpha beta minimax algorithm
 
-def minimax_AB(board: chess.Board, depth: int, alpha: int, beta: int, maximizing_player: bool, end_game=False, engineType=2, memo=None):
-    if memo is None:
-        memo = {}
 
-    key = (hash(board.fen()), depth)
-
-    if key in memo:
-        return memo[key]
-
-    if depth == 0 or board.is_game_over() or board.is_checkmate():
+def minimax_AB(board, depth: int, alpha: int, beta: int, maximizing_player: bool, end_game=False, engineType=2, memory=None):
+    if depth == 0 or is_game_over(board):
         return evaluate(board, end_game, engineType)
+
+    if memory is None:
+        memory = {}  # transposition table
+
+    key = (hash(board.fen()), depth)  # hashing fen
+
+    if key in memory:
+        return memory[key]
+
+    # memoryLength = len(memory)
 
     eval_func = max if maximizing_player else min
     best_eval = -INF if maximizing_player else INF
@@ -21,19 +25,25 @@ def minimax_AB(board: chess.Board, depth: int, alpha: int, beta: int, maximizing
 
     for move in moves:
         board.push(move)
-        evaluation = minimax_AB(board, depth - 1, alpha, beta, not maximizing_player, end_game, engineType, memo)
+        evaluation = minimax_AB(board, depth - 1, alpha, beta, not maximizing_player, end_game, engineType, memory)
         board.pop()
 
         best_eval = eval_func(best_eval, evaluation)
 
-        alpha = max(alpha, evaluation) if maximizing_player else alpha
-        beta = min(beta, evaluation) if not maximizing_player else beta
+        if maximizing_player:
+            if best_eval > alpha:
+                alpha = evaluation
+        else:
+            if best_eval < beta:
+                beta = evaluation
 
-        # print(alpha, beta)
-        if beta <= alpha:
-            break
+        if alpha >= beta:
+            return best_eval
 
-    if key not in memo:
-        memo[key] = best_eval
+    """if memoryLength > 100:
+        memory.clear()"""
+
+    if key not in memory:
+        memory[key] = best_eval
 
     return best_eval
