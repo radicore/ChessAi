@@ -2,7 +2,7 @@ import chess
 from chess import WHITE, BLACK, SQUARES, square_mirror, square_distance
 from piece_mapping import *
 from constants import *
-from bitboard_helper import count_rook_file_blockers
+from bitboard_helper import xray_rook_blockers
 
 # K16_2 uses only 2 evaluations: piece mapping and piece values, K16_1 uses 4 = slower
 
@@ -124,9 +124,9 @@ def evaluate(BOARD, end_game=False, engineType=1):
 
     for square in SQUARES:
         piece = BOARD.piece_at(square)
+        if piece is None: continue  # Is the square occupied?
+
         if end_game:  # If true, less evaluation is needed
-            if piece is None:  # Is the square occupied?
-                continue
 
             # For endgames the square mapping is decreased and legal moves increases (for checkmate finding)
             # if piece.piece_type in [ROOK, BISHOP]:
@@ -136,21 +136,19 @@ def evaluate(BOARD, end_game=False, engineType=1):
             score += val if piece.color == WHITE else -val
 
         elif engineType == 1:  # Slower but more accurate (?) engine
-            if piece is None: continue
 
             white_attackers = len(BOARD.attackers(WHITE, square))
             black_attackers = len(BOARD.attackers(BLACK, square))
 
             val = 0
-            if piece.piece_type == ROOK:
-                val -= count_rook_file_blockers(BOARD, square)
+            """if piece.piece_type == ROOK:
+                val -= xray_rook_blockers(BOARD, square)"""
 
             val += PIECE_VALUES[piece.piece_type] + square_mapping(piece, square, end_game) + abs(white_attackers - black_attackers)
             score += val if piece.color == WHITE else -val
 
             # score += attack_value
         else:  # Faster but less accurate (?) engine
-            if piece is None: continue
 
             val = PIECE_VALUES[piece.piece_type] + square_mapping(piece, square, end_game)
             score += val if piece.color == WHITE else -val

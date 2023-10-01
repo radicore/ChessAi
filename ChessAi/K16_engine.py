@@ -6,10 +6,11 @@ from depth_handler import set_depth, optimal_move
 from evaluation import is_end_game, evaluate
 from opening_handler import *
 from time import time
+from constants import nodes
 
 # FOREWORD: Make sure to calculate material advantage after takes n (inf) times to make it not think its a good trade at depth of 4
 
-ENGINE = "K16_2"  # Engine model
+ENGINE = "K16_1"  # Engine model
 COMPUTER = chess.WHITE  # Which side the computer plays as
 
 # Just realized it loops through all squares after each move push and calculating free files may be unnecessary as
@@ -24,11 +25,12 @@ COMPUTER = chess.WHITE  # Which side the computer plays as
 # 8/8/8/3KR3/8/5k2/8/8 w - - 10 6
 # r1bq1rk1/pppp1ppp/2n5/1B1P4/1b2p3/5N2/PPPPQPPP/R1B1K2R w KQ - 2 8
 # 1k6/2n1q1pp/pp6/8/4r3/1P4Q1/P1P2PPP/5RK1 w - - 0 30
+# r3r1k1/p1p2ppp/1pnq4/3p1b2/3Pn1P1/P2BBN2/2P2P1P/R3QRK1 b - g3 0 16
 
-board = chess.Board("8/8/8/8/3k4/8/7K/7Q w - - 0 1")  # Initializes the chess board. You can set the board FEN position as a string in the brackets
+board = chess.Board()  # Initializes the chess board. You can set the board FEN position as a string in the brackets
 
-MAX_DEPTH = 6  # None = Automatic, would recommend keeping it that way
-DO_OPENING = False  # Should the computer play instant openings?
+MAX_DEPTH = None  # None = Automatic, would recommend keeping it that way
+DO_OPENING = True  # Should the computer play instant openings?
 PROCESSORS = mp.cpu_count()  # Using all CPU's for faster (multi) processing - changing this to a value can cause results to vary
 
 game = chess.pgn.Game()  # To show game moves at the end / when you stop the program
@@ -48,6 +50,7 @@ def K16_move():
     board.push(best_move)
     print(f"\nBot has played {best_move} with an evaluation of {evaluation / 100} in {round((time() - start), 3)} seconds\n")
     print(board)
+    print("\nnodes", nodes)
     return best_move, evaluation
 
 

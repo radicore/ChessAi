@@ -45,6 +45,8 @@ EDGES = [
     H8, G8, F8, E8, D8, C8, B8
 ]
 
+nodes = 0
+
 # Bonus values
 
 OPEN_FILE = 20
@@ -58,5 +60,7 @@ PAIRED_BISHOPS = 20
 distance_dict = {
     7: 1, 6: 2, 5: 3, 4: 4, 3: 5, 2: 6, 1: 7
 }
+
+memory = {}
 
 # ZOBRIST_HASHES = [getrandbits(64) for _ in range(12*64)]

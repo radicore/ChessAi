@@ -3,7 +3,7 @@ import multiprocessing as mp
 from minimax import minimax_AB
 from organize import order_moves
 from evaluation import *
-
+from constants import memory
 
 def material_count(BOARD):  # adds up how many pieces there are all together (to assist set_depth)
     return sum(1 for square in SQUARES if BOARD.piece_at(square))
@@ -26,12 +26,12 @@ def set_depth(BOARD, engineType):
             if mc in [i for i in range(6, 15)]:
                 depth = 5
             else:
-                depth = 4
+                depth = 3
         else:
             if mc in [i for i in range(6, 15)]:
                 depth = 5
             else:
-                depth = 4
+                depth = 3
 
     if lm <= 8:
         depth += 1
@@ -44,15 +44,13 @@ def set_depth(BOARD, engineType):
 def optimal_move(max_depth, BOARD, end_game=False, engineType=2, debug=False, processes=4):
     # depth = max_depth
 
+    memory.clear()  # clears memory from previous searches (cleanup)
+
     step = 1
 
     best_move = None
 
     # Faster if you put best_eval, alpha and beta here than within the loop
-
-    best_eval = -INF if BOARD.turn else INF
-    alpha = -INF
-    beta = INF
 
     if max_depth == 10: step = 10  # for known position (rook + king)
 
@@ -60,6 +58,9 @@ def optimal_move(max_depth, BOARD, end_game=False, engineType=2, debug=False, pr
 
     with mp.Pool(processes=processes) as pool:
         for depth in range(1, max_depth+1, step):
+            best_eval = -INF if BOARD.turn else INF
+            alpha = -INF
+            beta = INF
 
             results = []
 
@@ -113,7 +114,6 @@ def optimal_move(max_depth, BOARD, end_game=False, engineType=2, debug=False, pr
                 return random.choice(list(BOARD.legal_moves)), best_eval
 
             if debug: print("Depth", depth, "Evaluation:", best_eval / 100, "Best move:", best_move)
-
 
     # for depth in range(max_depth-1, max_depth):
 
