@@ -27,14 +27,6 @@ def order_moves(BOARD: Board):
                     high_score_moves.insert(7, move)
                 else:  # capturing same valued piece (Great capture, e.g. Bishop x Bishop)
                     high_score_moves.insert(8, move)
-
-            """elif len(killer_moves) > 0:
-            try:
-                if killer_moves.index(move):
-                    # print("Killer move found and prioritised in list")
-                    high_score_moves.insert(9, move)
-            except ValueError:
-                high_score_moves.append(move)"""
         else:
             high_score_moves.append(move)
 
