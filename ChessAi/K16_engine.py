@@ -13,19 +13,9 @@ from constants import nodes
 ENGINE = "K16_1"  # Engine model
 COMPUTER = chess.WHITE  # Which side the computer plays as
 
-# Just realized it loops through all squares after each move push and calculating free files may be unnecessary as
-# the move pushed doesn't open the file, it assumes a blind new evaluation after each push. This is an efficiency
-# issue I cannot be bothered to address yet.
-
 # K16_1 - Slower, lower depth search but supposedly more accurate
 # K16_2 - Faster, higher depth search
 # K16_BLEND - (NOT AVAILABLE) Complement of both engines merged into one (alternating switch)
-
-# r5k1/1nqp1ppp/p1p1r3/1p2P3/4NBPb/1Q6/PPP2P1P/3RR1K1 w - - 4 20
-# 8/8/8/3KR3/8/5k2/8/8 w - - 10 6
-# r1bq1rk1/pppp1ppp/2n5/1B1P4/1b2p3/5N2/PPPPQPPP/R1B1K2R w KQ - 2 8
-# 1k6/2n1q1pp/pp6/8/4r3/1P4Q1/P1P2PPP/5RK1 w - - 0 30
-# r3r1k1/p1p2ppp/1pnq4/3p1b2/3Pn1P1/P2BBN2/2P2P1P/R3QRK1 b - g3 0 16
 
 board = chess.Board()  # Initializes the chess board. You can set the board FEN position as a string in the brackets
 
