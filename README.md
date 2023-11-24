@@ -1,25 +1,14 @@
 # ChessAi Introduction
-K16 (Kyro 16) is a chess engine that uses a range of algorithms and evaluation functions to determine which move is best, and this will run at a main depth of 3. The depth increase depending on the number of pieces on the board.
+K16 - Kyro 16, should be K17 now, is a chess engine that uses a range of algorithms and evaluation functions to determine and play which move is best.
 
-# Advantages
+# How to run
 
-- Opening and endgame evaluations works better, forced checkmates are usually found
-- K16 Engine can play as white or black
-- Opening moves are intergrated, so computing values at the start is not needed (instant openings)
+Navigate to the directory through typing `cd .\ChessAi` in your terminal. Then type `python K16_Engine.py` into the python terminal. Configurations are also kept inside this file so you can modify as you wish.
 
-# Disadvantages
+# Additional features
 
-- K16 only evaluates what it considers 'best moves'
-- Higher depth results in longer computing time.
-- Midgame evaluations are usually more complicated, and accuracy may decrease
-
-# Additions
-
-- Engine types: K16_1 is slower but includes more evaluations, making it (?) more accurate, K16_2 is faster (higher depth) at the cost of (?) lower accuracy
-
-# Things I need to add
-- Increase the values of piece mappings so it can decide if taking is really the best option and not doing an improving / repositional move
-- calculate a supposed infinite number of takes until there is no takes left, then record the material value and add it on
+- To display the current PGN you can type `pgn`
+- To display the current legal moves type `ls`
 
 # Unfamiliar with SAN Notation?
 - Check out this link: https://support.chess.com/article/409-what-do-the-numbers-and-letters-like-knight-c-3-mean
