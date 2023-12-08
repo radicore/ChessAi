@@ -54,6 +54,7 @@ def optimal_move(max_depth, BOARD, end_game=False, engineType=2, debug=False, pr
     # Faster if you put best_eval, alpha and beta here than within the loop
 
     if max_depth == 10: step = 10  # for known position (rook + king)
+    if end_game: PIECE_VALUES[PAWN] = 250
 
     moves = order_moves(BOARD)
 
