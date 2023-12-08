@@ -2,13 +2,13 @@ import random
 import re
 
 
-def book_to_array():
+def book_to_array(maxHistory):
     # Converts the txt file to a nested array containing the variation and the moves in that variation
     with open("book.txt", "r") as book:
         openings = book.read().strip().split("\n")  # for each variation
         book_moves_array = []
         for variation in openings:  # for each move in variation
-            book_moves_array.append(variation.split())  # split moves and append to book_moves_array
+            book_moves_array.append(variation.split()[:maxHistory])  # split moves and append to book_moves_array
 
         book.close()
 
@@ -31,7 +31,7 @@ def random_variation_move(variation, mainline, i):
     return None  # No more book moves
 
 
-def get_MM(pgn):  # get mainline moves (MM) from extracting specific moves from the current pgn using regex
+def get_mainline_moves(pgn):  # get mainline moves (MM) from extracting specific moves from the current pgn using regex
     pgn = str(pgn).strip()
     pgn = re.sub("\[.*", "", pgn)
     pgn = re.sub("\d+\.|\*", "", pgn)

@@ -1,21 +1,22 @@
-from chess import A1, A2, A3, A4, A5, A6, A7, A8, B1, C1, D1, E1, F1, G1, H1, H2, H3, H4, H5, H6, H7, H8, G8, F8, E8, D8, C8, B8, PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING
-from random import getrandbits
+from chess import PAWN, KNIGHT, BISHOP, ROOK, QUEEN, KING, BB_FILE_A, BB_FILE_H, BB_RANK_8, BB_RANK_1
+# from random import getrandbits
 
 # Piece values - pawn and minor pieces depend on each other:
 # As n pawns decrease, minor pieces increase
 # As n minors decrease, pawns increase
 
 PIECE_VALUES = {
-    PAWN: 100,
-    KNIGHT: 310,
+    PAWN: 120,
+    KNIGHT: 300,
     BISHOP: 320,  # bishops are generally worth more (can control more squares at once)
     ROOK: 500,
     QUEEN: 900,
     KING: 0
 }
 
-for k, v in PIECE_VALUES.items():
-    PIECE_VALUES[k] = v // 3  # 25, 77, 80, 125, 225 (updated values)
+EDGES = BB_FILE_A | BB_FILE_H | BB_RANK_8 | BB_RANK_1
+
+for k, v in PIECE_VALUES.items(): PIECE_VALUES[k] = v // 2  # 25, 77, 80, 125, 225 (updated values)
 
 """
 - KNIGHT = ~3 PAWNS
@@ -26,41 +27,24 @@ for k, v in PIECE_VALUES.items():
 
 INF = 1e6  # Checkmate value
 
-# Directional values
-
-NORTH = 8
-SOUTH = -8
-EAST = 1
-WEST = -1
-
-NORTH_EAST = NORTH + EAST
-NORTH_WEST = NORTH + WEST
-SOUTH_EAST = SOUTH + EAST
-SOUTH_WEST = SOUTH + WEST
-
-EDGES = [
-    A1, A2, A3, A4, A5, A6, A7,
-    A8, B1, C1, D1, E1, F1, G1,
-    H1, H2, H3, H4, H5, H6, H7,
-    H8, G8, F8, E8, D8, C8, B8
-]
-
-nodes = 0
-
 # Bonus values
 
-OPEN_FILE = 20
-SEMI_FILE = 10
+OPEN_RAY = 10
+SEMI_OPEN_RAY = 5
 
-PAIRED_ROOKS = 10
-PAIRED_BISHOPS = 20
+# CONNECTED_ROOKS = 10
+# PAIRED_BISHOPS = 20
+
+DOUBLED_PAWNS_PENALTY = 6
+ISOLATED_PAWNS_PENALTY = 3
+PAWN_CHAIN_BONUS = 3
+
+KING_PAWN_TROPISM = 2
 
 # dictionaries
 
-distance_dict = {
-    7: 1, 6: 2, 5: 3, 4: 4, 3: 5, 2: 6, 1: 7
-}
-
 memory = {}
+
+distance_dict = {7: 1, 6: 2, 5: 3, 4: 4, 3: 5, 2: 6, 1: 7}
 
 # ZOBRIST_HASHES = [getrandbits(64) for _ in range(12*64)]
