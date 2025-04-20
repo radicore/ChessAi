@@ -1,6 +1,6 @@
 # ChessAi Introduction
 K16 - Kyro 16 is a chess engine that uses a range of algorithms and evaluation functions to determine and play which move is best.
-This was for my A level Computer Science coursework! (2024)
+This was for my A level Computer Science coursework (2024) and was my very first chess engine. Looking back at it, I knew very little!
 
 # Requirements
 
